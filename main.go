@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 
-	"github.com/Trozz/terraform-provider-pocketid/internal/provider"
+	"github.com/pocket-id/terraform-provider-pocketid/internal/provider"
 )
 
 var (
@@ -23,7 +23,7 @@ func main() {
 	flag.Parse()
 
 	opts := providerserver.ServeOpts{
-		Address: "registry.terraform.io/trozz/pocketid",
+		Address: "registry.terraform.io/pocket-id/pocketid",
 		Debug:   debug,
 	}
 

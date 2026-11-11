@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Trozz/terraform-provider-pocketid/internal/resources"
+	"github.com/pocket-id/terraform-provider-pocketid/internal/resources"
 )
 
 func TestNewOneTimeAccessTokenResource(t *testing.T) {

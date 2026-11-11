@@ -4,6 +4,8 @@
 
 version: 2
 
+project_name: terraform-provider-pocketid
+
 # This is an example .goreleaser.yml file with some sensible defaults.
 # Make sure to check the documentation at https://goreleaser.com
 
@@ -102,7 +104,7 @@ signs:
 # Release configuration
 release:
   github:
-    owner: Trozz
+    owner: pocket-id
     name: terraform-provider-pocketid
 
   extra_files:
@@ -115,16 +117,16 @@ release:
 
     ### Provider Documentation
 
-    Documentation is available on the [Terraform Registry](https://registry.terraform.io/providers/trozz/pocketid/{{ .Version }}/docs).
+    Documentation is available on the [Terraform Registry](https://registry.terraform.io/providers/pocket-id/pocketid/{{ .Version }}/docs).
 
   footer: |
     ## What's Next?
 
-    - Read the [documentation](https://registry.terraform.io/providers/trozz/pocketid/latest/docs)
-    - Report issues on [GitHub](https://github.com/Trozz/terraform-provider-pocketid/issues)
+    - Read the [documentation](https://registry.terraform.io/providers/pocket-id/pocketid/latest/docs)
+    - Report issues on [GitHub](https://github.com/pocket-id/terraform-provider-pocketid/issues)
     - Join the discussion on [Pocket-ID](https://github.com/pocket-id/pocket-id)
 
-    **Full Changelog**: https://github.com/Trozz/terraform-provider-pocketid/compare/{{ .PreviousTag }}...{{ .Tag }}
+    **Full Changelog**: https://github.com/pocket-id/terraform-provider-pocketid/compare/{{ .PreviousTag }}...{{ .Tag }}
 
   # Prerelease configuration
   prerelease: auto

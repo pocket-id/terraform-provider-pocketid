@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Trozz/terraform-provider-pocketid/internal/client"
+	"github.com/pocket-id/terraform-provider-pocketid/internal/client"
 )
 
 const (

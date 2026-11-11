@@ -5,7 +5,7 @@
 provider-name: pocketid
 
 # Provider repository for full registry address
-provider-repository: registry.terraform.io/trozz/pocketid
+provider-repository: registry.terraform.io/pocket-id/pocketid
 
 # Render website docs suitable for deployment to registry.terraform.io
 # Enables special formatting for the Terraform Registry

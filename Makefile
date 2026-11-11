@@ -2,7 +2,7 @@
 
 # Variables
 PROVIDER_NAME = pocketid
-NAMESPACE = trozz
+NAMESPACE = pocket-id
 BINARY_NAME = terraform-provider-$(PROVIDER_NAME)
 VERSION ?= 0.1.0
 OS_ARCH ?= $(shell go env GOOS)_$(shell go env GOARCH)

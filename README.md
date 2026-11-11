@@ -1,9 +1,9 @@
 # Terraform Provider for Pocket-ID
 
-[![Terraform Registry](https://img.shields.io/badge/Terraform%20Registry-v0.1.0-blue)](https://registry.terraform.io/providers/trozz/pocketid/latest)
-[![CI](https://github.com/Trozz/terraform-provider-pocketid/actions/workflows/ci.yml/badge.svg)](https://github.com/Trozz/terraform-provider-pocketid/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/Trozz/terraform-provider-pocketid/branch/main/graph/badge.svg)](https://codecov.io/gh/Trozz/terraform-provider-pocketid)
-[![Go Report Card](https://goreportcard.com/badge/github.com/Trozz/terraform-provider-pocketid)](https://goreportcard.com/report/github.com/Trozz/terraform-provider-pocketid)
+[![Terraform Registry](https://img.shields.io/badge/Terraform%20Registry-v0.1.0-blue)](https://registry.terraform.io/providers/pocket-id/pocketid/latest)
+[![CI](https://github.com/pocket-id/terraform-provider-pocketid/actions/workflows/ci.yml/badge.svg)](https://github.com/pocket-id/terraform-provider-pocketid/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/pocket-id/terraform-provider-pocketid/branch/main/graph/badge.svg)](https://codecov.io/gh/pocket-id/terraform-provider-pocketid)
+[![Go Report Card](https://goreportcard.com/badge/github.com/pocket-id/terraform-provider-pocketid)](https://goreportcard.com/report/github.com/pocket-id/terraform-provider-pocketid)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 The Terraform Provider for [Pocket-ID](https://github.com/pocket-id/pocket-id) enables you to manage OIDC clients,
@@ -38,7 +38,7 @@ passwords. This makes it more secure and user-friendly than traditional authenti
 terraform {
   required_providers {
     pocketid = {
-      source  = "trozz/pocketid"
+      source  = "pocket-id/pocketid"
       version = "~> 1.0"
     }
   }
@@ -47,9 +47,9 @@ terraform {
 
 ### Manual Installation
 
-1. Download the latest release from the [releases page](https://github.com/Trozz/terraform-provider-pocketid/releases)
+1. Download the latest release from the [releases page](https://github.com/pocket-id/terraform-provider-pocketid/releases)
 2. Extract the archive
-3. Move the binary to `~/.terraform.d/plugins/registry.terraform.io/trozz/pocketid/${VERSION}/${OS_ARCH}/`
+3. Move the binary to `~/.terraform.d/plugins/registry.terraform.io/pocket-id/pocketid/${VERSION}/${OS_ARCH}/`
 
 #### Verifying Release Attestations
 
@@ -58,7 +58,7 @@ All release artifacts include build attestations for supply chain security. To v
 ```bash
 # Using GitHub CLI
 gh attestation verify terraform-provider-pocketid_v1.0.0_darwin_amd64.zip \
-  --owner Trozz \
+  --owner pocket-id \
   --repo terraform-provider-pocketid
 ```
 
@@ -139,14 +139,14 @@ resource "pocketid_user" "john_doe" {
 
 ## Documentation
 
-Full documentation is available on the [Terraform Registry](https://registry.terraform.io/providers/trozz/pocketid/latest/docs).
+Full documentation is available on the [Terraform Registry](https://registry.terraform.io/providers/pocket-id/pocketid/latest/docs).
 
 ### Quick Links
 
-- [Provider Configuration](https://registry.terraform.io/providers/trozz/pocketid/latest/docs)
-- [Resource: pocketid_client](https://registry.terraform.io/providers/trozz/pocketid/latest/docs/resources/client)
-- [Resource: pocketid_user](https://registry.terraform.io/providers/trozz/pocketid/latest/docs/resources/user)
-- [Resource: pocketid_group](https://registry.terraform.io/providers/trozz/pocketid/latest/docs/resources/group)
+- [Provider Configuration](https://registry.terraform.io/providers/pocket-id/pocketid/latest/docs)
+- [Resource: pocketid_client](https://registry.terraform.io/providers/pocket-id/pocketid/latest/docs/resources/client)
+- [Resource: pocketid_user](https://registry.terraform.io/providers/pocket-id/pocketid/latest/docs/resources/user)
+- [Resource: pocketid_group](https://registry.terraform.io/providers/pocket-id/pocketid/latest/docs/resources/group)
 
 ## Examples
 
@@ -168,7 +168,7 @@ See the [examples](examples/) directory for complete working examples:
 
 ```bash
 # Clone the repository
-git clone https://github.com/Trozz/terraform-provider-pocketid.git
+git clone https://github.com/pocket-id/terraform-provider-pocketid.git
 cd terraform-provider-pocketid
 
 # Install dependencies
@@ -222,7 +222,7 @@ See [TESTING.md](TESTING.md) for detailed testing instructions and strategies.
 
 This project uses [Codecov](https://codecov.io) for code coverage and test analytics:
 
-[![codecov](https://codecov.io/gh/Trozz/terraform-provider-pocketid/branch/main/graph/badge.svg)](https://codecov.io/gh/Trozz/terraform-provider-pocketid)
+[![codecov](https://codecov.io/gh/pocket-id/terraform-provider-pocketid/branch/main/graph/badge.svg)](https://codecov.io/gh/pocket-id/terraform-provider-pocketid)
 
 #### Features
 
@@ -316,8 +316,8 @@ Contributions are welcome! Please see our [Contributing Guidelines](CONTRIBUTING
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/Trozz/terraform-provider-pocketid/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/Trozz/terraform-provider-pocketid/discussions)
+- **Issues**: [GitHub Issues](https://github.com/pocket-id/terraform-provider-pocketid/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/pocket-id/terraform-provider-pocketid/discussions)
 - **Pocket-ID**: [Pocket-ID Repository](https://github.com/pocket-id/pocket-id)
 
 ## Security

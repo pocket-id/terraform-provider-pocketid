@@ -20,7 +20,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
 
-	"github.com/Trozz/terraform-provider-pocketid/internal/client"
+	"github.com/pocket-id/terraform-provider-pocketid/internal/client"
 )
 
 func TestAccResourceApplicationConfig_basic(t *testing.T) {

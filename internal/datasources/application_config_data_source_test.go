@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Trozz/terraform-provider-pocketid/internal/client"
-	"github.com/Trozz/terraform-provider-pocketid/internal/datasources"
+	"github.com/pocket-id/terraform-provider-pocketid/internal/client"
+	"github.com/pocket-id/terraform-provider-pocketid/internal/datasources"
 )
 
 func TestNewApplicationConfigDataSource(t *testing.T) {
