@@ -55,8 +55,8 @@ func (d *clientsDataSource) Metadata(_ context.Context, req datasource.MetadataR
 // Schema defines the schema for the data source.
 func (d *clientsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description:         "Fetches all OIDC clients from Pocket-ID.",
-		MarkdownDescription: "Fetches all OIDC clients from Pocket-ID.",
+		Description:         "Fetches all OIDC clients from Pocket ID.",
+		MarkdownDescription: "Fetches all OIDC clients from Pocket ID.",
 		Attributes: map[string]schema.Attribute{
 			"clients": schema.ListNestedAttribute{
 				Description: "List of all OIDC clients.",

@@ -14,13 +14,13 @@ provider "pocketid" {
 
 # Variables
 variable "pocketid_base_url" {
-  description = "Base URL for PocketID instance"
+  description = "Base URL for Pocket ID instance"
   type        = string
   default     = "http://localhost:1411"
 }
 
 variable "pocketid_api_token" {
-  description = "API token for PocketID authentication"
+  description = "API token for Pocket ID authentication"
   type        = string
   sensitive   = true
 }

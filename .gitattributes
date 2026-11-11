@@ -1,4 +1,4 @@
-# .gitattributes - Git attributes for Terraform Provider for Pocket-ID
+# .gitattributes - Git attributes for Terraform Provider for Pocket ID
 
 # Auto detect text files and perform LF normalization
 * text=auto eol=lf

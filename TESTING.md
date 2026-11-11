@@ -1,8 +1,8 @@
-# Testing Guide for Terraform Provider for Pocket-ID
+# Testing Guide for Terraform Provider for Pocket ID
 
 ## Overview
 
-This document explains how to test the Terraform Provider for Pocket-ID, including the limitations due to Pocket-ID's
+This document explains how to test the Terraform Provider for Pocket ID, including the limitations due to Pocket ID's
 security model and recommended testing strategies.
 
 ## Testing Approach
@@ -11,7 +11,7 @@ security model and recommended testing strategies.
 
 We've developed a solution that allows acceptance tests to run in CI by:
 
-1. Starting a containerized Pocket-ID instance
+1. Starting a containerized Pocket ID instance
 2. Using a pre-computed SHA256 hash of a known test token
 3. Injecting this hash directly into the SQLite database
 4. Bypassing the need for UI-based passkey registration
@@ -38,7 +38,7 @@ make test
 
 ### 2. Acceptance Tests (Automated in CI)
 
-Acceptance tests verify the provider functionality against a real Pocket-ID instance using the Go testing framework.
+Acceptance tests verify the provider functionality against a real Pocket ID instance using the Go testing framework.
 
 **Run acceptance tests locally:**
 
@@ -80,7 +80,7 @@ make test-env-stop
 The GitHub Actions workflow automatically runs:
 
 1. **Unit Tests**: Basic provider functionality tests
-2. **Acceptance Tests**: Tests using Go's testing framework against a real Pocket-ID instance
+2. **Acceptance Tests**: Tests using Go's testing framework against a real Pocket ID instance
 3. **Provider Binary Tests**: Tests using the actual Terraform binary with example configurations
 
 All of these run automatically on every push and pull request without manual intervention.
@@ -95,7 +95,7 @@ make test-full
 
 # Or run individual test suites
 make test              # Unit tests only
-make test-acc-local    # Acceptance tests with local Pocket-ID
+make test-acc-local    # Acceptance tests with local Pocket ID
 make test-provider-local  # Provider binary test with Terraform
 ```
 
@@ -103,7 +103,7 @@ make test-provider-local  # Provider binary test with Terraform
 
 For manual testing with a production-like setup:
 
-**Important**: Passkeys require a secure context (HTTPS), so you must set up Pocket-ID with TLS certificates.
+**Important**: Passkeys require a secure context (HTTPS), so you must set up Pocket ID with TLS certificates.
 
 #### Prerequisites
 
@@ -113,7 +113,7 @@ For manual testing with a production-like setup:
 
 #### Setup Instructions
 
-1. **Get the official Pocket-ID configuration**:
+1. **Get the official Pocket ID configuration**:
 
 ```bash
 # Download the official docker-compose.yml
@@ -214,7 +214,7 @@ docker-compose up -d
 
 ### Step 2: Initial Setup
 
-1. **Access Pocket-ID**: Navigate to <https://pocket-id-test.yourdomain.com> (replace with your domain)
+1. **Access Pocket ID**: Navigate to <https://pocket-id-test.yourdomain.com> (replace with your domain)
 2. **Create Admin User**:
    - Click "Register" or "Sign Up"
    - Enter username and email
@@ -322,7 +322,7 @@ After running acceptance tests, clean up test data:
 # Remove all test resources
 cd test && terraform destroy -auto-approve
 
-# Or manually through the Pocket-ID UI
+# Or manually through the Pocket ID UI
 ```
 
 ### Test Isolation
@@ -356,7 +356,7 @@ export TF_LOG_PROVIDER=DEBUG
 
 #### "Connection refused"
 
-- Ensure Pocket-ID is running
+- Ensure Pocket ID is running
 - Check the base URL is correct
 - Verify no firewall blocking
 
@@ -383,7 +383,7 @@ Since we can't run acceptance tests in CI, we recommend:
 3. **Monitoring**:
    - Track issues reported by users
    - Monitor provider usage patterns
-   - Regular compatibility testing with new Pocket-ID versions
+   - Regular compatibility testing with new Pocket ID versions
 
 ## Test Checklist
 
@@ -401,9 +401,9 @@ Before releasing a new version, ensure:
 
 ## Alternative Testing Approaches
 
-### Mock Pocket-ID Server
+### Mock Pocket ID Server
 
-Consider creating a mock Pocket-ID server for testing that:
+Consider creating a mock Pocket ID server for testing that:
 
 - Implements the same API endpoints
 - Allows programmatic user/key creation
@@ -413,11 +413,11 @@ Consider creating a mock Pocket-ID server for testing that:
 
 Maintain test fixtures with:
 
-- Pre-configured Pocket-ID Docker images
+- Pre-configured Pocket ID Docker images
 - Seeded test data
 - Known API keys for testing
 
-**Note**: This would require coordination with the Pocket-ID project to ensure test fixtures don't compromise security.
+**Note**: This would require coordination with the Pocket ID project to ensure test fixtures don't compromise security.
 
 ### TLS Certificate Options for Testing
 
@@ -454,4 +454,4 @@ When submitting PRs:
 
 We've implemented a comprehensive automated testing strategy that includes unit tests, acceptance tests, and integration
 tests. The test environment uses pre-seeded credentials specifically designed for testing purposes, enabling full CI/CD
-automation while preserving Pocket-ID's strong security architecture in production environments.
+automation while preserving Pocket ID's strong security architecture in production environments.

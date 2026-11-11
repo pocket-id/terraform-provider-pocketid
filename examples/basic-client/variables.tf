@@ -1,10 +1,10 @@
 variable "base_url" {
-  description = "The base URL of your Pocket-ID instance"
+  description = "The base URL of your Pocket ID instance"
   type        = string
 }
 
 variable "api_token" {
-  description = "API token for Pocket-ID authentication"
+  description = "API token for Pocket ID authentication"
   type        = string
   sensitive   = true
 }

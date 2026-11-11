@@ -1,6 +1,6 @@
 # Resource Creation Tests
 
-This test creates all types of resources supported by the PocketID provider.
+This test creates all types of resources supported by the Pocket ID provider.
 
 ## Resources Created
 
@@ -15,7 +15,7 @@ This test creates all types of resources supported by the PocketID provider.
 
    ```bash
    cp terraform.tfvars.example terraform.tfvars
-   # Edit terraform.tfvars with your PocketID instance details
+   # Edit terraform.tfvars with your Pocket ID instance details
    ```
 
 2. Initialize and apply:

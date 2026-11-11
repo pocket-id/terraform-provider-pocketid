@@ -33,7 +33,7 @@ const (
 
 const contentTypeJSON = "application/json"
 
-// Client represents a Pocket-ID API client
+// Client represents a Pocket ID API client
 type Client struct {
 	baseURL    string
 	apiToken   string
@@ -57,7 +57,7 @@ func (e *RateLimitError) Error() string {
 	return fmt.Sprintf("HTTP %d: %s", e.StatusCode, e.Message)
 }
 
-// NewClient creates a new Pocket-ID API client
+// NewClient creates a new Pocket ID API client
 func NewClient(baseURL, apiToken string, skipTLSVerify bool, timeout int64) (*Client, error) {
 	if baseURL == "" {
 		return nil, errors.New("base URL is required")
@@ -150,7 +150,7 @@ func (c *Client) usesClientSecretsEndpoint(ctx context.Context) bool {
 	return !current.LessThan(goversion.Must(goversion.NewVersion(MinVersionClientSecretsEndpoint)))
 }
 
-// doRequest performs an HTTP request to the Pocket-ID API
+// doRequest performs an HTTP request to the Pocket ID API
 func (c *Client) doRequest(ctx context.Context, method, endpoint string, body interface{}) ([]byte, error) {
 	var jsonBody []byte
 	if body != nil {
@@ -295,7 +295,7 @@ func (c *Client) doSingleRequest(ctx context.Context, method, endpoint, contentT
 	req.Header.Set("X-API-KEY", c.apiToken) // Note: Using X-API-KEY header, not Authorization Bearer
 
 	// Log request details (excluding sensitive headers)
-	tflog.Debug(ctx, "Pocket-ID API Request", map[string]interface{}{
+	tflog.Debug(ctx, "Pocket ID API Request", map[string]interface{}{
 		"method":   method,
 		"url":      url,
 		"endpoint": endpoint,
@@ -340,7 +340,7 @@ func (c *Client) doSingleRequest(ctx context.Context, method, endpoint, contentT
 	}
 
 	// Log response details
-	tflog.Debug(ctx, "Pocket-ID API Response", map[string]interface{}{
+	tflog.Debug(ctx, "Pocket ID API Response", map[string]interface{}{
 		"status_code": resp.StatusCode,
 		"status":      resp.Status,
 		"url":         url,
@@ -828,7 +828,7 @@ func (c *Client) GetApplicationConfig(ctx context.Context) (*ApplicationConfig, 
 
 // UpdateApplicationConfig updates the application configuration via
 // PUT /api/application-configuration. The provided config is sent in full; any
-// empty string field is reset to its server-side default by Pocket-ID.
+// empty string field is reset to its server-side default by Pocket ID.
 func (c *Client) UpdateApplicationConfig(ctx context.Context, cfg *ApplicationConfig) (*ApplicationConfig, error) {
 	body, err := c.doRequest(ctx, "PUT", "/api/application-configuration", cfg)
 	if err != nil {

@@ -1,4 +1,4 @@
-# Pocket-ID Configuration
+# Pocket ID Configuration
 base_url  = "https://pocket-id.example.com"
 api_token = "your-api-token-here"
 

@@ -45,7 +45,7 @@ func (r *ldapSyncResource) Metadata(_ context.Context, req resource.MetadataRequ
 
 func (r *ldapSyncResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Triggers an LDAP synchronization in Pocket-ID. This is an action resource: applying it " +
+		MarkdownDescription: "Triggers an LDAP synchronization in Pocket ID. This is an action resource: applying it " +
 			"runs a sync, and changing `triggers` forces a new sync (the resource is recreated). LDAP must be enabled " +
 			"in the application configuration, otherwise the sync — and the apply — fails.",
 		Attributes: map[string]schema.Attribute{

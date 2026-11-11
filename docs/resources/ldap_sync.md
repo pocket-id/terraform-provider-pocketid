@@ -3,19 +3,19 @@
 page_title: "pocketid_ldap_sync Resource - terraform-provider-pocketid"
 subcategory: ""
 description: |-
-  Triggers an LDAP synchronization in Pocket-ID. This is an action resource: applying it runs a sync, and changing triggers forces a new sync (the resource is recreated). LDAP must be enabled in the application configuration, otherwise the sync — and the apply — fails.
+  Triggers an LDAP synchronization in Pocket ID. This is an action resource: applying it runs a sync, and changing triggers forces a new sync (the resource is recreated). LDAP must be enabled in the application configuration, otherwise the sync — and the apply — fails.
 ---
 
 # pocketid_ldap_sync (Resource)
 
-Triggers an LDAP synchronization in Pocket-ID. This is an action resource: applying it runs a sync, and changing `triggers` forces a new sync (the resource is recreated). LDAP must be enabled in the application configuration, otherwise the sync — and the apply — fails.
+Triggers an LDAP synchronization in Pocket ID. This is an action resource: applying it runs a sync, and changing `triggers` forces a new sync (the resource is recreated). LDAP must be enabled in the application configuration, otherwise the sync — and the apply — fails.
 
 ## Example Usage
 
 ```terraform
 # Configure LDAP via the application configuration.
 resource "pocketid_application_config" "this" {
-  app_name     = "My Pocket-ID"
+  app_name     = "My Pocket ID"
   ldap_enabled = "true"
   ldap_url     = "ldaps://ldap.example.com:636"
   ldap_base    = "dc=example,dc=com"

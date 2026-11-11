@@ -3,18 +3,18 @@
 page_title: "pocketid_scim_service_provider Resource - terraform-provider-pocketid"
 subcategory: ""
 description: |-
-  Manages the SCIM service provider configuration for an OIDC client in Pocket-ID. This enables Pocket-ID to provision users and groups to an external service via SCIM. Each OIDC client may have a single SCIM service provider configuration.
+  Manages the SCIM service provider configuration for an OIDC client in Pocket ID. This enables Pocket ID to provision users and groups to an external service via SCIM. Each OIDC client may have a single SCIM service provider configuration.
 ---
 
 # pocketid_scim_service_provider (Resource)
 
-Manages the SCIM service provider configuration for an OIDC client in Pocket-ID. This enables Pocket-ID to provision users and groups to an external service via SCIM. Each OIDC client may have a single SCIM service provider configuration.
+Manages the SCIM service provider configuration for an OIDC client in Pocket ID. This enables Pocket ID to provision users and groups to an external service via SCIM. Each OIDC client may have a single SCIM service provider configuration.
 
 ## Example Usage
 
 ```terraform
 # Configure SCIM provisioning for an OIDC client.
-# Pocket-ID will provision users and groups to the external SCIM endpoint.
+# Pocket ID will provision users and groups to the external SCIM endpoint.
 resource "pocketid_client" "example" {
   name          = "SCIM Enabled App"
   callback_urls = ["https://app.example.com/callback"]

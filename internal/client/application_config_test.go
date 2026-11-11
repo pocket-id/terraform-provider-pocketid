@@ -81,7 +81,7 @@ func TestUpdateApplicationConfig(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	// The PUT body should carry the JSON keys expected by Pocket-ID.
+	// The PUT body should carry the JSON keys expected by Pocket ID.
 	assert.Equal(t, "Updated App", receivedBody["appName"])
 	assert.Equal(t, "smtp.example.com", receivedBody["smtpHost"])
 

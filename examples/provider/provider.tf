@@ -7,9 +7,9 @@ terraform {
   }
 }
 
-# Configure the Pocket-ID Provider
+# Configure the Pocket ID Provider
 provider "pocketid" {
-  # The base URL of your Pocket-ID instance
+  # The base URL of your Pocket ID instance
   base_url = "https://pocket-id.example.com"
 
   # API token for authentication
@@ -25,7 +25,7 @@ provider "pocketid" {
 
 # Variable for API token to avoid hardcoding sensitive values
 variable "pocketid_api_token" {
-  description = "API token for Pocket-ID authentication"
+  description = "API token for Pocket ID authentication"
   type        = string
   sensitive   = true
 }

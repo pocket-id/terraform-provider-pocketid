@@ -1,6 +1,6 @@
 package client
 
-// ErrorResponse represents an error response from the Pocket-ID API
+// ErrorResponse represents an error response from the Pocket ID API
 type ErrorResponse struct {
 	Error   string `json:"error"`
 	Message string `json:"message,omitempty"`
@@ -25,7 +25,7 @@ type VersionResponse struct {
 	CurrentVersion string `json:"currentVersion"`
 }
 
-// OIDCClient represents an OIDC client in Pocket-ID
+// OIDCClient represents an OIDC client in Pocket ID
 type OIDCClient struct {
 	ID                       string   `json:"id,omitempty"`
 	Name                     string   `json:"name"`
@@ -34,7 +34,7 @@ type OIDCClient struct {
 	LogoutCallbackURLs       []string `json:"logoutCallbackURLs,omitempty"`
 	IsPublic                 bool     `json:"isPublic"`
 	RequiresReauthentication bool     `json:"requiresReauthentication,omitempty"`
-	// Pointer so an absent field (Pocket-ID <= v2.8.0, which has no PAR support)
+	// Pointer so an absent field (Pocket ID <= v2.8.0, which has no PAR support)
 	// is distinguishable from an explicit false.
 	RequiresPushedAuthorizationRequests *bool                 `json:"requiresPushedAuthorizationRequests,omitempty"`
 	LaunchURL                           string                `json:"launchURL,omitempty"`
@@ -55,7 +55,7 @@ type OIDCClient struct {
 	LogoURL                     *string `json:"logoUrl,omitempty"`
 	DarkLogoURL                 *string `json:"darkLogoUrl,omitempty"`
 
-	// Secret Pocket-ID generates on create when autoCreateOidcClientSecret is
+	// Secret Pocket ID generates on create when autoCreateOidcClientSecret is
 	// enabled (after v2.16.0). Only present in the create response.
 	CreatedSecret *ClientSecretResponse `json:"createdSecret,omitempty"`
 }
@@ -127,7 +127,7 @@ type UpdateAllowedUserGroupsRequest struct {
 	UserGroupIDs []string `json:"userGroupIds"`
 }
 
-// User represents a user in Pocket-ID
+// User represents a user in Pocket ID
 type User struct {
 	ID            string        `json:"id,omitempty"`
 	Username      string        `json:"username"`
@@ -163,7 +163,7 @@ type UpdateUserGroupsRequest struct {
 	UserGroupIDs []string `json:"userGroupIds"`
 }
 
-// UserGroup represents a user group in Pocket-ID
+// UserGroup represents a user group in Pocket ID
 type UserGroup struct {
 	ID           string        `json:"id,omitempty"`
 	Name         string        `json:"name"`
@@ -188,7 +188,7 @@ type CustomClaim struct {
 }
 
 // ApplicationConfig represents the writable application configuration of a
-// Pocket-ID instance. Every value is stored as a string by the API. The JSON
+// Pocket ID instance. Every value is stored as a string by the API. The JSON
 // tags match the keys returned by GET /api/application-configuration/all and
 // the body expected by PUT /api/application-configuration.
 type ApplicationConfig struct {
@@ -275,7 +275,7 @@ type APIKey struct {
 }
 
 // ScimServiceProvider represents a SCIM service provider configuration attached
-// to an OIDC client in Pocket-ID. The token is stored encrypted server-side but
+// to an OIDC client in Pocket ID. The token is stored encrypted server-side but
 // is returned (decrypted) on read.
 type ScimServiceProvider struct {
 	ID           string              `json:"id,omitempty"`

@@ -1,4 +1,4 @@
-# Manage the global application configuration of a Pocket-ID instance.
+# Manage the global application configuration of a Pocket ID instance.
 #
 # This is a singleton resource: only one should exist per instance. Any
 # attribute left unset inherits the current server-side value. Removing the

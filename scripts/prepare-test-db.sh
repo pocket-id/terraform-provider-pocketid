@@ -45,7 +45,7 @@ if [ -n "$POCKET_ID_IMAGE" ]; then
         -p 1411:1411 \
         -v "$TEST_DATA_DIR/data:/app/data" \
         "$POCKET_ID_IMAGE"
-    echo "Pocket-ID container started."
+    echo "Pocket ID container started."
 else
     # Binary mode: download pocket-id binary if not present.
     if [ ! -f "$POCKET_ID_BINARY" ]; then
@@ -98,14 +98,14 @@ else
     POCKET_ID_PID=$!
     cd "$PROJECT_ROOT"
 
-    echo "Pocket-ID started with PID: $POCKET_ID_PID"
+    echo "Pocket ID started with PID: $POCKET_ID_PID"
 
     # Give pocket-id a moment to start
     sleep 2
 
     # Check if the process is still running
     if ! kill -0 $POCKET_ID_PID 2>/dev/null; then
-        echo "ERROR: Pocket-ID process died immediately!"
+        echo "ERROR: Pocket ID process died immediately!"
         echo "Checking log file..."
         if [ -f "$TEST_DATA_DIR/pocket-id.log" ]; then
             cat "$TEST_DATA_DIR/pocket-id.log"
@@ -127,7 +127,7 @@ sqlite_db() {
 # serving /healthz after every migration has run; checking for a table instead
 # passes as soon as an early migration creates it, and seeding then races the
 # later ones (e.g. "table users has no column named display_name").
-echo "Waiting for Pocket-ID database and migrations..."
+echo "Waiting for Pocket ID database and migrations..."
 MAX_RETRIES=30
 RETRY_COUNT=0
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
@@ -220,14 +220,14 @@ echo "  POCKETID_API_TOKEN=$TEST_TOKEN"
 echo "Waiting for pocket-id to be ready..."
 for i in {1..10}; do
     if curl -s http://localhost:1411/ > /dev/null 2>&1; then
-        echo "Pocket-ID is ready!"
+        echo "Pocket ID is ready!"
         break
     fi
     echo "Waiting for pocket-id to start... (attempt $i/10)"
     sleep 1
 done
 
-echo "Pocket-ID test environment ready!"
+echo "Pocket ID test environment ready!"
 if [ -n "$POCKET_ID_IMAGE" ]; then
     echo "Container: pocket-id-test"
 else

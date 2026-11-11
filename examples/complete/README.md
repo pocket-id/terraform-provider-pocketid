@@ -1,6 +1,6 @@
-# Complete Pocket-ID Provider Example
+# Complete Pocket ID Provider Example
 
-This example demonstrates a complete setup of the Pocket-ID Terraform provider, showcasing all available resources and
+This example demonstrates a complete setup of the Pocket ID Terraform provider, showcasing all available resources and
 data sources.
 
 ## What This Example Creates
@@ -28,7 +28,7 @@ data sources.
 
 ## Prerequisites
 
-1. A running Pocket-ID instance
+1. A running Pocket ID instance
 2. An API token with administrative privileges
 3. Terraform 1.0 or later
 
@@ -137,7 +137,7 @@ terraform output
 
 After creating users, they must:
 
-1. Visit your Pocket-ID instance URL
+1. Visit your Pocket ID instance URL
 2. Log in with their username
 3. Register a passkey through the web interface
 

@@ -1,5 +1,5 @@
 # Configure SCIM provisioning for an OIDC client.
-# Pocket-ID will provision users and groups to the external SCIM endpoint.
+# Pocket ID will provision users and groups to the external SCIM endpoint.
 resource "pocketid_client" "example" {
   name          = "SCIM Enabled App"
   callback_urls = ["https://app.example.com/callback"]

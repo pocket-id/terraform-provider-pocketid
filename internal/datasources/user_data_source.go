@@ -52,8 +52,8 @@ func (d *userDataSource) Metadata(_ context.Context, req datasource.MetadataRequ
 // Schema defines the schema for the data source.
 func (d *userDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description:         "Fetches a user from Pocket-ID.",
-		MarkdownDescription: "Fetches a user from Pocket-ID by their ID or username. Exactly one of `id` or `username` must be specified.",
+		Description:         "Fetches a user from Pocket ID.",
+		MarkdownDescription: "Fetches a user from Pocket ID by their ID or username. Exactly one of `id` or `username` must be specified.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description:         "The ID of the user to fetch. Exactly one of `id` or `username` must be specified.",

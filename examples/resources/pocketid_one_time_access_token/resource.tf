@@ -55,7 +55,7 @@ resource "pocketid_one_time_access_token" "onboarding" {
 # This is just an example - use your actual notification provider
 resource "example_email" "welcome" {
   to      = pocketid_user.new_user.email
-  subject = "Welcome to Pocket-ID"
+  subject = "Welcome to Pocket ID"
   body    = <<-EOT
     Welcome ${pocketid_user.new_user.first_name}!
 

@@ -100,7 +100,7 @@ func (d *applicationConfigDataSource) Metadata(_ context.Context, req datasource
 // Schema defines the schema for the data source.
 func (d *applicationConfigDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Retrieves the global application configuration of a Pocket-ID instance.",
+		Description: "Retrieves the global application configuration of a Pocket ID instance.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Fixed identifier of the application configuration singleton.",

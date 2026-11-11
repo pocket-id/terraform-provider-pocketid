@@ -108,7 +108,7 @@ func TestProvider_Schema(t *testing.T) {
 	assert.False(t, resp.Diagnostics.HasError())
 	assert.NotNil(t, resp.Schema)
 	assert.NotEmpty(t, resp.Schema.Description)
-	assert.Contains(t, resp.Schema.Description, "Pocket-ID")
+	assert.Contains(t, resp.Schema.Description, "Pocket ID")
 
 	// Check all expected attributes
 	expectedAttributes := []string{
@@ -208,7 +208,7 @@ func TestProvider_Configure(t *testing.T) {
 				"timeout":         tftypes.NewValue(tftypes.Number, nil),
 			},
 			expectError:   true,
-			errorContains: []string{"Missing Pocket-ID Base URL"},
+			errorContains: []string{"Missing Pocket ID Base URL"},
 		},
 		{
 			name: "empty_base_url",
@@ -219,7 +219,7 @@ func TestProvider_Configure(t *testing.T) {
 				"timeout":         tftypes.NewValue(tftypes.Number, nil),
 			},
 			expectError:   true,
-			errorContains: []string{"Missing Pocket-ID Base URL"},
+			errorContains: []string{"Missing Pocket ID Base URL"},
 		},
 		{
 			name: "missing_api_token",
@@ -230,7 +230,7 @@ func TestProvider_Configure(t *testing.T) {
 				"timeout":         tftypes.NewValue(tftypes.Number, nil),
 			},
 			expectError:   true,
-			errorContains: []string{"Missing Pocket-ID API Token"},
+			errorContains: []string{"Missing Pocket ID API Token"},
 		},
 		{
 			name: "empty_api_token",
@@ -241,7 +241,7 @@ func TestProvider_Configure(t *testing.T) {
 				"timeout":         tftypes.NewValue(tftypes.Number, nil),
 			},
 			expectError:   true,
-			errorContains: []string{"Missing Pocket-ID API Token"},
+			errorContains: []string{"Missing Pocket ID API Token"},
 		},
 		{
 			name: "unknown_base_url",
@@ -252,7 +252,7 @@ func TestProvider_Configure(t *testing.T) {
 				"timeout":         tftypes.NewValue(tftypes.Number, nil),
 			},
 			expectError:   true,
-			errorContains: []string{"Unknown Pocket-ID Base URL"},
+			errorContains: []string{"Unknown Pocket ID Base URL"},
 		},
 		{
 			name: "unknown_api_token",
@@ -263,7 +263,7 @@ func TestProvider_Configure(t *testing.T) {
 				"timeout":         tftypes.NewValue(tftypes.Number, nil),
 			},
 			expectError:   true,
-			errorContains: []string{"Unknown Pocket-ID API Token"},
+			errorContains: []string{"Unknown Pocket ID API Token"},
 		},
 		{
 			name: "skip_tls_verify_true",
@@ -446,7 +446,7 @@ func TestProvider_Configure_EdgeCases(t *testing.T) {
 		errors := resp.Diagnostics.Errors()
 		assert.NotEmpty(t, errors, "Expected at least one error diagnostic")
 		if len(errors) > 0 {
-			assert.Contains(t, errors[0].Summary(), "Missing Pocket-ID Base URL")
+			assert.Contains(t, errors[0].Summary(), "Missing Pocket ID Base URL")
 		}
 	})
 }

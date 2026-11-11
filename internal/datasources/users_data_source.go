@@ -57,8 +57,8 @@ func (d *usersDataSource) Metadata(_ context.Context, req datasource.MetadataReq
 // Schema defines the schema for the data source.
 func (d *usersDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description:         "Fetches all users from Pocket-ID.",
-		MarkdownDescription: "Fetches all users from Pocket-ID.",
+		Description:         "Fetches all users from Pocket ID.",
+		MarkdownDescription: "Fetches all users from Pocket ID.",
 		Attributes: map[string]schema.Attribute{
 			"users": schema.ListNestedAttribute{
 				Description: "List of all users.",

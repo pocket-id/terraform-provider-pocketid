@@ -1,4 +1,4 @@
-# Terraform Provider for Pocket-ID
+# Terraform Provider for Pocket ID
 
 [![Terraform Registry](https://img.shields.io/badge/Terraform%20Registry-v0.1.0-blue)](https://registry.terraform.io/providers/pocket-id/pocketid/latest)
 [![CI](https://github.com/pocket-id/terraform-provider-pocketid/actions/workflows/ci.yml/badge.svg)](https://github.com/pocket-id/terraform-provider-pocketid/actions/workflows/ci.yml)
@@ -6,12 +6,12 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/pocket-id/terraform-provider-pocketid)](https://goreportcard.com/report/github.com/pocket-id/terraform-provider-pocketid)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-The Terraform Provider for [Pocket-ID](https://github.com/pocket-id/pocket-id) enables you to manage OIDC clients,
-users, and groups in your Pocket-ID instance using Infrastructure as Code.
+The Terraform Provider for [Pocket ID](https://github.com/pocket-id/pocket-id) enables you to manage OIDC clients,
+users, and groups in your Pocket ID instance using Infrastructure as Code.
 
-## What is Pocket-ID?
+## What is Pocket ID?
 
-Pocket-ID is a simple, self-hosted OpenID Connect (OIDC) provider that uses passkeys for authentication instead of
+Pocket ID is a simple, self-hosted OpenID Connect (OIDC) provider that uses passkeys for authentication instead of
 passwords. This makes it more secure and user-friendly than traditional authentication methods.
 
 ## Features
@@ -27,8 +27,8 @@ passwords. This makes it more secure and user-friendly than traditional authenti
 
 - [Terraform](https://www.terraform.io/downloads.html) >= 1.0
 - [Go](https://golang.org/doc/install) >= 1.20 (for development)
-- A running [Pocket-ID](https://github.com/pocket-id/pocket-id) instance
-- An API token from your Pocket-ID instance
+- A running [Pocket ID](https://github.com/pocket-id/pocket-id) instance
+- An API token from your Pocket ID instance
 
 ## Installation
 
@@ -162,7 +162,7 @@ See the [examples](examples/) directory for complete working examples:
 
 - Go 1.20+
 - Terraform 1.0+
-- A Pocket-ID instance for testing
+- A Pocket ID instance for testing
 
 ### Building the Provider
 
@@ -183,7 +183,7 @@ make install
 
 ### Running Tests
 
-**Important Note**: Due to Pocket-ID's security model, acceptance tests cannot be run in CI/CD pipelines. Pocket-ID requires:
+**Important Note**: Due to Pocket ID's security model, acceptance tests cannot be run in CI/CD pipelines. Pocket ID requires:
 
 - Manual passkey registration through the web UI
 - Manual API key generation through the admin interface
@@ -198,9 +198,9 @@ make test
 
 #### Acceptance Tests (Manual)
 
-Acceptance tests require a manually configured Pocket-ID instance:
+Acceptance tests require a manually configured Pocket ID instance:
 
-1. Start a Pocket-ID instance
+1. Start a Pocket ID instance
 2. Register a user with a passkey through the web UI
 3. Generate an API key in the admin interface
 4. Set environment variables:
@@ -262,7 +262,7 @@ make test-coverage
 
 ### Local Development
 
-1. Start a local Pocket-ID instance:
+1. Start a local Pocket ID instance:
 
    ```bash
    make pocket-id-start
@@ -318,7 +318,7 @@ Contributions are welcome! Please see our [Contributing Guidelines](CONTRIBUTING
 
 - **Issues**: [GitHub Issues](https://github.com/pocket-id/terraform-provider-pocketid/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/pocket-id/terraform-provider-pocketid/discussions)
-- **Pocket-ID**: [Pocket-ID Repository](https://github.com/pocket-id/pocket-id)
+- **Pocket ID**: [Pocket ID Repository](https://github.com/pocket-id/pocket-id)
 
 ## Security
 
@@ -336,7 +336,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- The [Pocket-ID](https://github.com/pocket-id/pocket-id) team for creating an awesome OIDC provider
+- The [Pocket ID](https://github.com/pocket-id/pocket-id) team for creating an awesome OIDC provider
 - The [Terraform Plugin Framework](https://github.com/hashicorp/terraform-plugin-framework) team
 - All [contributors](CONTRIBUTORS.md) who have helped improve this provider
 
@@ -346,4 +346,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-Made with ❤️ by the Terraform Pocket-ID Provider community
+Made with ❤️ by the Terraform Pocket ID Provider community

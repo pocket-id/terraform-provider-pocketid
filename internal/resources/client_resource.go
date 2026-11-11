@@ -125,8 +125,8 @@ func (r *clientResource) Metadata(_ context.Context, req resource.MetadataReques
 // Schema defines the schema for the resource.
 func (r *clientResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Manages an OIDC client in Pocket-ID.",
-		MarkdownDescription: `Manages an OIDC client in Pocket-ID. OIDC clients are applications that can authenticate users through Pocket-ID.
+		Description: "Manages an OIDC client in Pocket ID.",
+		MarkdownDescription: `Manages an OIDC client in Pocket ID. OIDC clients are applications that can authenticate users through Pocket ID.
 
 ~> **Note** The client secret is only available during resource creation and cannot be retrieved later. Store it securely.`,
 		Attributes: map[string]schema.Attribute{
@@ -209,8 +209,8 @@ func (r *clientResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 			},
 			"requires_pushed_authorization_requests": schema.BoolAttribute{
 				Description: "Whether this client requires Pushed Authorization Requests (PAR, RFC 9126). Defaults to false. " +
-					"Applies to confidential clients only — Pocket-ID coerces this to false for public clients (is_public = true). " +
-					"Enforced only by Pocket-ID versions that support PAR (v2.9.0+); on older versions the value is stored in state but not enforced.",
+					"Applies to confidential clients only — Pocket ID coerces this to false for public clients (is_public = true). " +
+					"Enforced only by Pocket ID versions that support PAR (v2.9.0+); on older versions the value is stored in state but not enforced.",
 				Optional: true,
 				Computed: true,
 				Default:  booldefault.StaticBool(false),
@@ -304,7 +304,7 @@ func (r *clientResource) ValidateConfig(ctx context.Context, req resource.Valida
 		return
 	}
 
-	// Pocket-ID coerces requires_pushed_authorization_requests to false for
+	// Pocket ID coerces requires_pushed_authorization_requests to false for
 	// public clients, so true + is_public is never satisfiable.
 	if config.IsPublic.ValueBool() && config.RequiresPushedAuthorizationRequests.ValueBool() {
 		resp.Diagnostics.AddAttributeError(
@@ -396,7 +396,7 @@ func (r *clientResource) Create(ctx context.Context, req resource.CreateRequest,
 	plan.FederatedIdentities = apiModel.FederatedIdentities
 	plan.LaunchURL = apiModel.LaunchURL
 	// Preserve the configured PAR value when the server does not return the field
-	// (Pocket-ID <= v2.8.0). Only override from the API when it is present.
+	// (Pocket ID <= v2.8.0). Only override from the API when it is present.
 	if clientResp.RequiresPushedAuthorizationRequests != nil {
 		plan.RequiresPushedAuthorizationRequests = types.BoolValue(*clientResp.RequiresPushedAuthorizationRequests)
 	}
@@ -418,14 +418,14 @@ func (r *clientResource) Create(ctx context.Context, req resource.CreateRequest,
 			)
 			return
 		}
-		// Revoke the secret Pocket-ID created alongside the client, otherwise it
+		// Revoke the secret Pocket ID created alongside the client, otherwise it
 		// stays valid without Terraform tracking it.
 		if clientResp.CreatedSecret != nil {
 			if err := r.client.DeleteClientSecret(ctx, clientResp.ID, clientResp.CreatedSecret.ID); err != nil {
 				_ = r.client.DeleteClient(ctx, clientResp.ID)
 				resp.Diagnostics.AddError(
 					"Error revoking auto-created client secret",
-					"Could not revoke the client secret created by Pocket-ID, the client was deleted. Error: "+err.Error(),
+					"Could not revoke the client secret created by Pocket ID, the client was deleted. Error: "+err.Error(),
 				)
 				return
 			}
@@ -517,7 +517,7 @@ func (r *clientResource) Read(ctx context.Context, req resource.ReadRequest, res
 	state.HasDarkLogo = types.BoolValue(clientResp.HasDarkLogo)
 	state.RequiresReauthentication = types.BoolValue(clientResp.RequiresReauthentication)
 	// Only refresh PAR from the API when the server returns the field; otherwise
-	// preserve the existing state value (Pocket-ID <= v2.8.0 omits it). On import
+	// preserve the existing state value (Pocket ID <= v2.8.0 omits it). On import
 	// there is no prior value, so fall back to the default of false.
 	if clientResp.RequiresPushedAuthorizationRequests != nil {
 		state.RequiresPushedAuthorizationRequests = types.BoolValue(*clientResp.RequiresPushedAuthorizationRequests)

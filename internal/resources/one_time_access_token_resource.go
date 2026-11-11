@@ -48,7 +48,7 @@ func (r *OneTimeAccessTokenResource) Metadata(ctx context.Context, req resource.
 
 func (r *OneTimeAccessTokenResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Manages a one-time access token for a user in Pocket-ID. These tokens let a user authenticate when they don't have access to their passkey. " +
+		MarkdownDescription: "Manages a one-time access token for a user in Pocket ID. These tokens let a user authenticate when they don't have access to their passkey. " +
 			"The token value is returned only once on creation and cannot be read back (pocket-id exposes no read endpoint), so it is stored in Terraform state as a sensitive value.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{

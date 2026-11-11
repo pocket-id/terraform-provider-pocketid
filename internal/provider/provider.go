@@ -56,10 +56,10 @@ func (p *pocketIDProvider) Metadata(_ context.Context, _ provider.MetadataReques
 // Schema defines the provider-level schema for configuration data.
 func (p *pocketIDProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Interact with Pocket-ID OIDC provider. Pocket-ID is a simple and easy-to-use OIDC provider\nthat allows users to authenticate with their passkeys to your services.",
+		Description: "Interact with Pocket ID OIDC provider. Pocket ID is a simple and easy-to-use OIDC provider\nthat allows users to authenticate with their passkeys to your services.",
 		Attributes: map[string]schema.Attribute{
 			"base_url": schema.StringAttribute{
-				Description: "Base URL of the Pocket-ID instance. Can also be set via POCKETID_BASE_URL environment variable.",
+				Description: "Base URL of the Pocket ID instance. Can also be set via POCKETID_BASE_URL environment variable.",
 				Optional:    true,
 			},
 			"api_token": schema.StringAttribute{
@@ -79,9 +79,9 @@ func (p *pocketIDProvider) Schema(_ context.Context, _ provider.SchemaRequest, r
 	}
 }
 
-// Configure prepares a Pocket-ID API client for data sources and resources.
+// Configure prepares a Pocket ID API client for data sources and resources.
 func (p *pocketIDProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
-	tflog.Info(ctx, "Configuring Pocket-ID provider")
+	tflog.Info(ctx, "Configuring Pocket ID provider")
 
 	// Retrieve provider data from configuration
 	var config pocketIDProviderModel
@@ -96,8 +96,8 @@ func (p *pocketIDProvider) Configure(ctx context.Context, req provider.Configure
 	if config.BaseURL.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("base_url"),
-			"Unknown Pocket-ID Base URL",
-			"The provider cannot create the Pocket-ID client as there is an unknown configuration value for the Pocket-ID base URL. "+
+			"Unknown Pocket ID Base URL",
+			"The provider cannot create the Pocket ID client as there is an unknown configuration value for the Pocket ID base URL. "+
 				"Either target apply the source of the value first, set the value statically in the configuration, or use the POCKETID_BASE_URL environment variable.",
 		)
 	}
@@ -105,8 +105,8 @@ func (p *pocketIDProvider) Configure(ctx context.Context, req provider.Configure
 	if config.APIToken.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("api_token"),
-			"Unknown Pocket-ID API Token",
-			"The provider cannot create the Pocket-ID client as there is an unknown configuration value for the Pocket-ID API token. "+
+			"Unknown Pocket ID API Token",
+			"The provider cannot create the Pocket ID client as there is an unknown configuration value for the Pocket ID API token. "+
 				"Either target apply the source of the value first, set the value statically in the configuration, or use the POCKETID_API_TOKEN environment variable.",
 		)
 	}
@@ -133,8 +133,8 @@ func (p *pocketIDProvider) Configure(ctx context.Context, req provider.Configure
 	if baseURL == "" {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("base_url"),
-			"Missing Pocket-ID Base URL",
-			"The provider cannot create the Pocket-ID client as there is a missing or empty value for the Pocket-ID base URL. "+
+			"Missing Pocket ID Base URL",
+			"The provider cannot create the Pocket ID client as there is a missing or empty value for the Pocket ID base URL. "+
 				"Set the base_url value in the configuration or use the POCKETID_BASE_URL environment variable. "+
 				"If either is already set, ensure the value is not empty.",
 		)
@@ -143,8 +143,8 @@ func (p *pocketIDProvider) Configure(ctx context.Context, req provider.Configure
 	if apiToken == "" {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("api_token"),
-			"Missing Pocket-ID API Token",
-			"The provider cannot create the Pocket-ID client as there is a missing or empty value for the Pocket-ID API token. "+
+			"Missing Pocket ID API Token",
+			"The provider cannot create the Pocket ID client as there is a missing or empty value for the Pocket ID API token. "+
 				"Set the api_token value in the configuration or use the POCKETID_API_TOKEN environment variable. "+
 				"If either is already set, ensure the value is not empty.",
 		)
@@ -170,26 +170,26 @@ func (p *pocketIDProvider) Configure(ctx context.Context, req provider.Configure
 	ctx = tflog.SetField(ctx, "pocketid_timeout", timeout)
 	ctx = tflog.MaskFieldValuesWithFieldKeys(ctx, "pocketid_api_token")
 
-	tflog.Debug(ctx, "Creating Pocket-ID client")
+	tflog.Debug(ctx, "Creating Pocket ID client")
 
-	// Create a new Pocket-ID client using the configuration values
+	// Create a new Pocket ID client using the configuration values
 	client, err := client.NewClient(baseURL, apiToken, skipTLSVerify, timeout)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unable to Create Pocket-ID Client",
-			"An unexpected error occurred when creating the Pocket-ID client. "+
+			"Unable to Create Pocket ID Client",
+			"An unexpected error occurred when creating the Pocket ID client. "+
 				"If the error is not clear, please contact the provider developers.\n\n"+
-				"Pocket-ID Client Error: "+err.Error(),
+				"Pocket ID Client Error: "+err.Error(),
 		)
 		return
 	}
 
-	// Make the Pocket-ID client available during DataSource and Resource
+	// Make the Pocket ID client available during DataSource and Resource
 	// type Configure methods.
 	resp.DataSourceData = client
 	resp.ResourceData = client
 
-	tflog.Info(ctx, "Configured Pocket-ID client", map[string]any{"success": true})
+	tflog.Info(ctx, "Configured Pocket ID client", map[string]any{"success": true})
 }
 
 // DataSources defines the data sources implemented in the provider.

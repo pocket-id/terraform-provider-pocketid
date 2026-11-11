@@ -40,7 +40,7 @@ This test verifies all data source functionality by looking up resources created
    ```bash
    cp terraform.tfvars.example terraform.tfvars
    # Edit terraform.tfvars with:
-   # - Your PocketID instance details
+   # - Your Pocket ID instance details
    # - Resource IDs from the resource creation test
    ```
 

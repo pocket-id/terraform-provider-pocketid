@@ -1,6 +1,6 @@
 # User and Group Management Example
 
-This example demonstrates comprehensive user and group management in Pocket-ID using Terraform.
+This example demonstrates comprehensive user and group management in Pocket ID using Terraform.
 
 ## Overview
 
@@ -32,7 +32,7 @@ This example shows how to:
 ## Prerequisites
 
 - Terraform >= 1.0
-- A running Pocket-ID instance
+- A running Pocket ID instance
 - An API token with admin privileges
 
 ## Usage
@@ -44,7 +44,7 @@ This example shows how to:
    ```
 
 2. Edit `terraform.tfvars` with your configuration:
-   - Update the Pocket-ID connection details
+   - Update the Pocket ID connection details
    - Customize the users and groups for your organization
 
 3. Initialize and apply:
@@ -113,6 +113,6 @@ terraform destroy
 ## Important Notes
 
 - Users created through Terraform won't have passwords or passkeys set
-- Users will need to complete registration through the Pocket-ID UI
+- Users will need to complete registration through the Pocket ID UI
 - Admin privileges should be granted sparingly
 - Group memberships are managed through the user resource, not the group resource

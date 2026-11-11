@@ -1,6 +1,6 @@
 # Basic OIDC Client Example
 
-This example demonstrates the minimal configuration required to create an OIDC client in Pocket-ID.
+This example demonstrates the minimal configuration required to create an OIDC client in Pocket ID.
 
 ## Overview
 
@@ -13,7 +13,7 @@ This example creates:
 ## Prerequisites
 
 - Terraform >= 1.0
-- A running Pocket-ID instance
+- A running Pocket ID instance
 - An API token with admin privileges
 
 ## Usage
@@ -25,7 +25,7 @@ This example creates:
    ```
 
 2. Edit `terraform.tfvars` with your configuration:
-   - `base_url`: Your Pocket-ID instance URL
+   - `base_url`: Your Pocket ID instance URL
    - `api_token`: Your admin API token
    - `client_name`: Name for your OIDC client
    - `callback_urls`: OAuth2 callback URLs for your application

@@ -3,15 +3,15 @@
 page_title: "pocketid_user Resource - terraform-provider-pocketid"
 subcategory: ""
 description: |-
-  Manages a user in Pocket-ID.
-  ~> Important Users must complete passkey registration through the Pocket-ID web interface. This resource only creates the user account; authentication setup must be done separately.
+  Manages a user in Pocket ID.
+  ~> Important Users must complete passkey registration through the Pocket ID web interface. This resource only creates the user account; authentication setup must be done separately.
 ---
 
 # pocketid_user (Resource)
 
-Manages a user in Pocket-ID.
+Manages a user in Pocket ID.
 
-~> **Important** Users must complete passkey registration through the Pocket-ID web interface. This resource only creates the user account; authentication setup must be done separately.
+~> **Important** Users must complete passkey registration through the Pocket ID web interface. This resource only creates the user account; authentication setup must be done separately.
 
 ## Example Usage
 
@@ -88,7 +88,7 @@ resource "pocketid_user" "team" {
 
 # Create a user with custom claims included in OIDC tokens.
 # Setting custom_claims replaces all custom claims for the user.
-# Reserved claim names (e.g. "email", "groups", "sub") are rejected by Pocket-ID.
+# Reserved claim names (e.g. "email", "groups", "sub") are rejected by Pocket ID.
 resource "pocketid_user" "with_claims" {
   username   = "claims.user"
   email      = "claims.user@example.com"
@@ -129,7 +129,7 @@ resource "pocketid_user" "with_picture" {
 
 ### Optional
 
-- `custom_claims` (Map of String) Custom claims to include in the user's OIDC tokens, as a map of claim name to value. Setting this attribute replaces all custom claims for the user. Reserved claim names (e.g. `email`, `groups`, `sub`) are rejected by Pocket-ID.
+- `custom_claims` (Map of String) Custom claims to include in the user's OIDC tokens, as a map of claim name to value. Setting this attribute replaces all custom claims for the user. Reserved claim names (e.g. `email`, `groups`, `sub`) are rejected by Pocket ID.
 - `disabled` (Boolean) Whether the user account is disabled. Defaults to false.
 - `display_name` (String) The display name of the user. Computed from first and last name if not set.
 - `email_verified` (Boolean) Whether the user's email address is verified. Defaults to false.

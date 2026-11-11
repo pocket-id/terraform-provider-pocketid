@@ -1,4 +1,4 @@
-# Makefile for Terraform Pocket-ID Provider
+# Makefile for Terraform Pocket ID Provider
 
 # Variables
 PROVIDER_NAME = pocketid
@@ -29,7 +29,7 @@ NC = \033[0m # No Color
 
 .PHONY: help
 help: ## Show this help message
-	@echo "$(CYAN)Terraform Pocket-ID Provider Makefile$(NC)"
+	@echo "$(CYAN)Terraform Pocket ID Provider Makefile$(NC)"
 	@echo "$(GREEN)Usage:$(NC) make [target]"
 	@echo ""
 	@echo "$(YELLOW)Available targets:$(NC)"
@@ -193,7 +193,7 @@ example-plan: ## Run terraform plan on complete example
 	@cd examples/complete && terraform plan
 
 .PHONY: test-integration
-test-integration: ## Run integration tests against live Pocket-ID instance
+test-integration: ## Run integration tests against live Pocket ID instance
 	@echo "$(GREEN)Running integration tests...$(NC)"
 	@cd examples/complete && terraform init && terraform apply -auto-approve
 	@echo "$(GREEN)Integration tests complete!$(NC)"
@@ -231,10 +231,10 @@ docker-test: ## Run tests in Docker container
 	@docker run --rm -v $(PWD):/workspace -w /workspace golang:1.21 make test
 
 .PHONY: test-env-start
-test-env-start: ## Start Pocket-ID test environment
-	@echo "$(GREEN)Starting Pocket-ID test environment...$(NC)"
+test-env-start: ## Start Pocket ID test environment
+	@echo "$(GREEN)Starting Pocket ID test environment...$(NC)"
 	@docker compose -f docker-compose.test.yml up -d
-	@echo "$(YELLOW)Waiting for Pocket-ID to be ready...$(NC)"
+	@echo "$(YELLOW)Waiting for Pocket ID to be ready...$(NC)"
 	@sleep 10
 	@./scripts/prepare-test-db.sh
 	@echo "$(GREEN)Test environment ready!$(NC)"
@@ -242,18 +242,18 @@ test-env-start: ## Start Pocket-ID test environment
 	@echo "  POCKETID_API_TOKEN=test-terraform-provider-token-123456789"
 
 .PHONY: test-env-stop
-test-env-stop: ## Stop Pocket-ID test environment
-	@echo "$(GREEN)Stopping Pocket-ID test environment...$(NC)"
+test-env-stop: ## Stop Pocket ID test environment
+	@echo "$(GREEN)Stopping Pocket ID test environment...$(NC)"
 	@docker compose -f docker-compose.test.yml down
 	@rm -rf test-data
 	@echo "$(GREEN)Test environment stopped$(NC)"
 
 .PHONY: test-env-logs
-test-env-logs: ## Show Pocket-ID test environment logs
+test-env-logs: ## Show Pocket ID test environment logs
 	@docker compose -f docker-compose.test.yml logs -f
 
 .PHONY: test-acc-local
-test-acc-local: test-env-start ## Run acceptance tests with local Pocket-ID
+test-acc-local: test-env-start ## Run acceptance tests with local Pocket ID
 	@export POCKETID_BASE_URL=http://localhost:1411 && \
 	export POCKETID_API_TOKEN=test-terraform-provider-token-123456789 && \
 	$(MAKE) test-acc
@@ -288,7 +288,7 @@ debug-env: ## Show environment variables for debugging
 
 .PHONY: version
 version: ## Show version information
-	@echo "$(CYAN)Terraform Pocket-ID Provider$(NC)"
+	@echo "$(CYAN)Terraform Pocket ID Provider$(NC)"
 	@echo "  Version: $(VERSION)"
 	@echo "  Go Version: $(shell go version)"
 	@echo "  Git Commit: $(shell git rev-parse --short HEAD 2>/dev/null || echo 'unknown')"

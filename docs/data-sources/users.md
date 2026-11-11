@@ -3,12 +3,12 @@
 page_title: "pocketid_users Data Source - terraform-provider-pocketid"
 subcategory: ""
 description: |-
-  Fetches all users from Pocket-ID.
+  Fetches all users from Pocket ID.
 ---
 
 # pocketid_users (Data Source)
 
-Fetches all users from Pocket-ID.
+Fetches all users from Pocket ID.
 
 ## Example Usage
 

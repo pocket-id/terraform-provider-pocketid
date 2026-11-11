@@ -508,7 +508,7 @@ func TestAccResourceClient_requiresPushedAuthorizationRequests(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
-			// Set PAR to true. On Pocket-ID <= v2.8.0 the API does not echo the
+			// Set PAR to true. On Pocket ID <= v2.8.0 the API does not echo the
 			// field, so the provider preserves the configured value (no
 			// inconsistent-result error, no perpetual diff).
 			{
@@ -632,7 +632,7 @@ resource "pocketid_client" "test" {
 }
 
 func testAccResourceClientConfig_par(name string, par bool) string {
-	// PAR applies to confidential clients; Pocket-ID coerces it to false for
+	// PAR applies to confidential clients; Pocket ID coerces it to false for
 	// public clients, so this must use a non-public client.
 	return testAccProviderConfig() + fmt.Sprintf(`
 resource "pocketid_client" "test" {

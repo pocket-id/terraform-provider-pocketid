@@ -3,12 +3,12 @@
 page_title: "pocketid_user Data Source - terraform-provider-pocketid"
 subcategory: ""
 description: |-
-  Fetches a user from Pocket-ID by their ID or username. Exactly one of id or username must be specified.
+  Fetches a user from Pocket ID by their ID or username. Exactly one of id or username must be specified.
 ---
 
 # pocketid_user (Data Source)
 
-Fetches a user from Pocket-ID by their ID or username. Exactly one of `id` or `username` must be specified.
+Fetches a user from Pocket ID by their ID or username. Exactly one of `id` or `username` must be specified.
 
 ## Example Usage
 

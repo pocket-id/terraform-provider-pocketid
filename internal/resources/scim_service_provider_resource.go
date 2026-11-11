@@ -52,9 +52,9 @@ func (r *scimServiceProviderResource) Metadata(_ context.Context, req resource.M
 // Schema defines the schema for the resource.
 func (r *scimServiceProviderResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Manages the SCIM service provider configuration for an OIDC client in Pocket-ID.",
-		MarkdownDescription: "Manages the SCIM service provider configuration for an OIDC client in Pocket-ID. " +
-			"This enables Pocket-ID to provision users and groups to an external service via SCIM. " +
+		Description: "Manages the SCIM service provider configuration for an OIDC client in Pocket ID.",
+		MarkdownDescription: "Manages the SCIM service provider configuration for an OIDC client in Pocket ID. " +
+			"This enables Pocket ID to provision users and groups to an external service via SCIM. " +
 			"Each OIDC client may have a single SCIM service provider configuration.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{

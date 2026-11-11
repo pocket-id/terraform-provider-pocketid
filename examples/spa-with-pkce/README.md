@@ -23,7 +23,7 @@ PKCE is the recommended approach for OAuth2 in public clients (like SPAs) becaus
 ## Prerequisites
 
 - Terraform >= 1.0
-- A running Pocket-ID instance
+- A running Pocket ID instance
 - An API token with admin privileges
 
 ## Usage
@@ -35,7 +35,7 @@ PKCE is the recommended approach for OAuth2 in public clients (like SPAs) becaus
    ```
 
 2. Edit `terraform.tfvars` with your configuration:
-   - `base_url`: Your Pocket-ID instance URL
+   - `base_url`: Your Pocket ID instance URL
    - `api_token`: Your admin API token
    - `app_name`: Name for your SPA
    - `app_urls`: URLs where your SPA is hosted

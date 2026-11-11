@@ -1,4 +1,4 @@
-# PocketID Provider Tests
+# Pocket ID Provider Tests
 
 This directory contains comprehensive Terraform configurations to test all provider functionality.
 
@@ -16,7 +16,7 @@ The tests are split into two separate configurations:
 ```bash
 cd terraform-resources
 cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars with your PocketID instance details
+# Edit terraform.tfvars with your Pocket ID instance details
 
 terraform init
 terraform apply
@@ -31,7 +31,7 @@ terraform output -json > ../terraform-data-sources/resource-ids.json
 cd ../terraform-data-sources
 cp terraform.tfvars.example terraform.tfvars
 # Edit terraform.tfvars with:
-# - Your PocketID instance details
+# - Your Pocket ID instance details
 # - Resource IDs from Step 1
 
 terraform init

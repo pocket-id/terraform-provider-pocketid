@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Terraform Provider for Pocket-ID - Test Environment Setup Script
+# Terraform Provider for Pocket ID - Test Environment Setup Script
 
 set -e
 
@@ -11,7 +11,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}=== Terraform Provider for Pocket-ID - Test Environment Setup ===${NC}"
+echo -e "${BLUE}=== Terraform Provider for Pocket ID - Test Environment Setup ===${NC}"
 echo
 
 # Check if Docker is installed
@@ -31,8 +31,8 @@ echo -e "${GREEN}Creating test directory: ${TEST_DIR}${NC}"
 mkdir -p ${TEST_DIR}
 cd ${TEST_DIR}
 
-# Download official Pocket-ID files
-echo -e "${GREEN}Downloading official Pocket-ID configuration...${NC}"
+# Download official Pocket ID files
+echo -e "${GREEN}Downloading official Pocket ID configuration...${NC}"
 curl -sO https://raw.githubusercontent.com/pocket-id/pocket-id/main/docker-compose.yml
 curl -sO https://raw.githubusercontent.com/pocket-id/pocket-id/main/.env.example
 cp .env.example .env
@@ -136,8 +136,8 @@ echo
 echo -e "${GREEN}=== Next Steps ===${NC}"
 echo
 echo "1. Complete the configuration steps above"
-echo "2. Start Pocket-ID: docker compose up -d"
-echo "3. Access Pocket-ID at https://your-domain.com"
+echo "2. Start Pocket ID: docker compose up -d"
+echo "3. Access Pocket ID at https://your-domain.com"
 echo "4. Create an admin user and register a passkey"
 echo "5. Generate an API key in Settings → API Keys"
 echo "6. Set environment variables for testing:"

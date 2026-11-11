@@ -64,10 +64,10 @@ func (r *userResource) Metadata(_ context.Context, req resource.MetadataRequest,
 // Schema defines the schema for the resource.
 func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Manages a user in Pocket-ID.",
-		MarkdownDescription: `Manages a user in Pocket-ID.
+		Description: "Manages a user in Pocket ID.",
+		MarkdownDescription: `Manages a user in Pocket ID.
 
-~> **Important** Users must complete passkey registration through the Pocket-ID web interface. This resource only creates the user account; authentication setup must be done separately.`,
+~> **Important** Users must complete passkey registration through the Pocket ID web interface. This resource only creates the user account; authentication setup must be done separately.`,
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "The ID of the user. If not set, Pocket ID generates a UUID automatically. If set, it must be a valid UUID. Changing this value forces recreation of the resource.",
@@ -139,8 +139,8 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				ElementType: types.StringType,
 			},
 			"custom_claims": schema.MapAttribute{
-				Description:         "Custom claims to include in the user's OIDC tokens, as a map of claim name to value. Reserved claim names (e.g. 'email', 'groups', 'sub') are rejected by Pocket-ID.",
-				MarkdownDescription: "Custom claims to include in the user's OIDC tokens, as a map of claim name to value. Setting this attribute replaces all custom claims for the user. Reserved claim names (e.g. `email`, `groups`, `sub`) are rejected by Pocket-ID.",
+				Description:         "Custom claims to include in the user's OIDC tokens, as a map of claim name to value. Reserved claim names (e.g. 'email', 'groups', 'sub') are rejected by Pocket ID.",
+				MarkdownDescription: "Custom claims to include in the user's OIDC tokens, as a map of claim name to value. Setting this attribute replaces all custom claims for the user. Reserved claim names (e.g. `email`, `groups`, `sub`) are rejected by Pocket ID.",
 				Optional:            true,
 				ElementType:         types.StringType,
 			},

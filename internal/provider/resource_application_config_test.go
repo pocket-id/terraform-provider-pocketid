@@ -28,7 +28,7 @@ import (
 
 func TestAccResourceApplicationConfig_basic(t *testing.T) {
 	resourceName := "pocketid_application_config.test"
-	// Pocket-ID enforces appName max length of 30 characters, so keep both the
+	// Pocket ID enforces appName max length of 30 characters, so keep both the
 	// create and update names short and distinct.
 	suffix := acctest.RandString(8)
 	appName := "tf-acc-" + suffix
@@ -68,7 +68,7 @@ func TestAccResourceApplicationConfig_basic(t *testing.T) {
 }
 
 func TestAccResourceApplicationConfig_dataSource(t *testing.T) {
-	// Pocket-ID enforces appName max length of 30 characters.
+	// Pocket ID enforces appName max length of 30 characters.
 	appName := "tf-acc-" + acctest.RandString(8)
 
 	resource.Test(t, resource.TestCase{

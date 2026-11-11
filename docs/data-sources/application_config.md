@@ -3,17 +3,17 @@
 page_title: "pocketid_application_config Data Source - terraform-provider-pocketid"
 subcategory: ""
 description: |-
-  Retrieves the global application configuration of a Pocket-ID instance.
+  Retrieves the global application configuration of a Pocket ID instance.
 ---
 
 # pocketid_application_config (Data Source)
 
-Retrieves the global application configuration of a Pocket-ID instance.
+Retrieves the global application configuration of a Pocket ID instance.
 
 ## Example Usage
 
 ```terraform
-# Read the global application configuration of the Pocket-ID instance.
+# Read the global application configuration of the Pocket ID instance.
 data "pocketid_application_config" "current" {}
 
 # Reference configuration values elsewhere.

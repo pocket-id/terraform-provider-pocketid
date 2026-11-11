@@ -170,7 +170,7 @@ test-fixtures/
 .terraformrc.local
 dev.tfvars
 
-# Pocket-ID source for local testing
+# Pocket ID source for local testing
 pocket-id-source/data/
 pocket-id-source/.env
 pocket-id-source/certs/

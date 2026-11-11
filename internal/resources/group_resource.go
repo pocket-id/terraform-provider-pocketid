@@ -50,8 +50,8 @@ func (r *groupResource) Metadata(_ context.Context, req resource.MetadataRequest
 // Schema defines the schema for the resource.
 func (r *groupResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description:         "Manages a user group in Pocket-ID.",
-		MarkdownDescription: "Manages a user group in Pocket-ID. Groups can be used to organize users and control access to OIDC clients.",
+		Description:         "Manages a user group in Pocket ID.",
+		MarkdownDescription: "Manages a user group in Pocket ID. Groups can be used to organize users and control access to OIDC clients.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "The ID of the user group.",
@@ -76,8 +76,8 @@ func (r *groupResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 				},
 			},
 			"custom_claims": schema.MapAttribute{
-				Description:         "Custom claims to include in the OIDC tokens of users in this group, as a map of claim name to value. Reserved claim names (e.g. 'email', 'groups', 'sub') are rejected by Pocket-ID.",
-				MarkdownDescription: "Custom claims to include in the OIDC tokens of users in this group, as a map of claim name to value. Setting this attribute replaces all custom claims for the group. Reserved claim names (e.g. `email`, `groups`, `sub`) are rejected by Pocket-ID.",
+				Description:         "Custom claims to include in the OIDC tokens of users in this group, as a map of claim name to value. Reserved claim names (e.g. 'email', 'groups', 'sub') are rejected by Pocket ID.",
+				MarkdownDescription: "Custom claims to include in the OIDC tokens of users in this group, as a map of claim name to value. Setting this attribute replaces all custom claims for the group. Reserved claim names (e.g. `email`, `groups`, `sub`) are rejected by Pocket ID.",
 				Optional:            true,
 				ElementType:         types.StringType,
 			},

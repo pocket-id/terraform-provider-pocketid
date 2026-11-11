@@ -3,12 +3,12 @@
 page_title: "pocketid_one_time_access_token Resource - terraform-provider-pocketid"
 subcategory: ""
 description: |-
-  Manages a one-time access token for a user in Pocket-ID. These tokens let a user authenticate when they don't have access to their passkey. The token value is returned only once on creation and cannot be read back (pocket-id exposes no read endpoint), so it is stored in Terraform state as a sensitive value.
+  Manages a one-time access token for a user in Pocket ID. These tokens let a user authenticate when they don't have access to their passkey. The token value is returned only once on creation and cannot be read back (pocket-id exposes no read endpoint), so it is stored in Terraform state as a sensitive value.
 ---
 
 # pocketid_one_time_access_token (Resource)
 
-Manages a one-time access token for a user in Pocket-ID. These tokens let a user authenticate when they don't have access to their passkey. The token value is returned only once on creation and cannot be read back (pocket-id exposes no read endpoint), so it is stored in Terraform state as a sensitive value.
+Manages a one-time access token for a user in Pocket ID. These tokens let a user authenticate when they don't have access to their passkey. The token value is returned only once on creation and cannot be read back (pocket-id exposes no read endpoint), so it is stored in Terraform state as a sensitive value.
 
 ## Example Usage
 
@@ -70,7 +70,7 @@ resource "pocketid_one_time_access_token" "onboarding" {
 # This is just an example - use your actual notification provider
 resource "example_email" "welcome" {
   to      = pocketid_user.new_user.email
-  subject = "Welcome to Pocket-ID"
+  subject = "Welcome to Pocket ID"
   body    = <<-EOT
     Welcome ${pocketid_user.new_user.first_name}!
 

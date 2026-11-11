@@ -1,4 +1,4 @@
-# Read the global application configuration of the Pocket-ID instance.
+# Read the global application configuration of the Pocket ID instance.
 data "pocketid_application_config" "current" {}
 
 # Reference configuration values elsewhere.

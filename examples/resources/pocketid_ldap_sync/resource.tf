@@ -1,6 +1,6 @@
 # Configure LDAP via the application configuration.
 resource "pocketid_application_config" "this" {
-  app_name     = "My Pocket-ID"
+  app_name     = "My Pocket ID"
   ldap_enabled = "true"
   ldap_url     = "ldaps://ldap.example.com:636"
   ldap_base    = "dc=example,dc=com"

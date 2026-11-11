@@ -6,7 +6,7 @@ resource "pocketid_user" "example" {
 
 # Create a user with custom claims included in OIDC tokens.
 # Setting custom_claims replaces all custom claims for the user.
-# Reserved claim names (e.g. "email", "groups", "sub") are rejected by Pocket-ID.
+# Reserved claim names (e.g. "email", "groups", "sub") are rejected by Pocket ID.
 resource "pocketid_user" "with_claims" {
   username   = "claims.user"
   email      = "claims.user@example.com"

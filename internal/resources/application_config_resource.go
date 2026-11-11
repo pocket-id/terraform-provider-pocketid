@@ -303,8 +303,8 @@ func (r *applicationConfigResource) Metadata(_ context.Context, req resource.Met
 // Schema defines the schema for the resource.
 func (r *applicationConfigResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description:         "Manages the global application configuration of a Pocket-ID instance.",
-		MarkdownDescription: "Manages the global application configuration of a Pocket-ID instance. This is a singleton resource: only one should exist per instance. Any attribute left unset inherits the current server-side value, and removing the resource from configuration leaves the live configuration untouched.",
+		Description:         "Manages the global application configuration of a Pocket ID instance.",
+		MarkdownDescription: "Manages the global application configuration of a Pocket ID instance. This is a singleton resource: only one should exist per instance. Any attribute left unset inherits the current server-side value, and removing the resource from configuration leaves the live configuration untouched.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Fixed identifier of the application configuration singleton.",
@@ -603,7 +603,7 @@ func (r *applicationConfigResource) applyApplicationImage(ctx context.Context, i
 // Delete removes the resource from state. The application configuration is a
 // singleton that always exists, so the live configuration is left untouched.
 func (r *applicationConfigResource) Delete(ctx context.Context, _ resource.DeleteRequest, _ *resource.DeleteResponse) {
-	tflog.Info(ctx, "Removing application configuration from state; the live Pocket-ID configuration is left unchanged")
+	tflog.Info(ctx, "Removing application configuration from state; the live Pocket ID configuration is left unchanged")
 }
 
 // ImportState imports the singleton application configuration into Terraform.

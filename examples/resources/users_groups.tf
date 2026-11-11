@@ -20,7 +20,7 @@ resource "pocketid_group" "api_consumers" {
 }
 
 # Example: Creating Users
-# Note: Users must complete passkey registration through the Pocket-ID UI
+# Note: Users must complete passkey registration through the Pocket ID UI
 # This resource creates the user account, but authentication setup is done separately
 
 resource "pocketid_user" "admin_user" {

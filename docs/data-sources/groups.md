@@ -2,12 +2,12 @@
 page_title: "pocketid_groups Data Source - terraform-provider-pocketid"
 subcategory: ""
 description: |-
-  Retrieves information about all Pocket-ID groups.
+  Retrieves information about all Pocket ID groups.
 ---
 
 # pocketid_groups (Data Source)
 
-Retrieves information about all Pocket-ID groups.
+Retrieves information about all Pocket ID groups.
 
 ## Example Usage
 

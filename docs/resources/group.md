@@ -3,12 +3,12 @@
 page_title: "pocketid_group Resource - terraform-provider-pocketid"
 subcategory: ""
 description: |-
-  Manages a user group in Pocket-ID. Groups can be used to organize users and control access to OIDC clients.
+  Manages a user group in Pocket ID. Groups can be used to organize users and control access to OIDC clients.
 ---
 
 # pocketid_group (Resource)
 
-Manages a user group in Pocket-ID. Groups can be used to organize users and control access to OIDC clients.
+Manages a user group in Pocket ID. Groups can be used to organize users and control access to OIDC clients.
 
 ## Example Usage
 
@@ -84,7 +84,7 @@ resource "pocketid_group" "departments" {
 
 # Create a group with custom claims included in member OIDC tokens.
 # Setting custom_claims replaces all custom claims for the group.
-# Reserved claim names (e.g. "email", "groups", "sub") are rejected by Pocket-ID.
+# Reserved claim names (e.g. "email", "groups", "sub") are rejected by Pocket ID.
 resource "pocketid_group" "with_claims" {
   name          = "platform"
   friendly_name = "Platform Team"
@@ -117,7 +117,7 @@ output "department_groups" {
 
 ### Optional
 
-- `custom_claims` (Map of String) Custom claims to include in the OIDC tokens of users in this group, as a map of claim name to value. Setting this attribute replaces all custom claims for the group. Reserved claim names (e.g. `email`, `groups`, `sub`) are rejected by Pocket-ID.
+- `custom_claims` (Map of String) Custom claims to include in the OIDC tokens of users in this group, as a map of claim name to value. Setting this attribute replaces all custom claims for the group. Reserved claim names (e.g. `email`, `groups`, `sub`) are rejected by Pocket ID.
 
 ### Read-Only
 

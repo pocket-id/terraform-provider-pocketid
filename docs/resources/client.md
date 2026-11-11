@@ -3,13 +3,13 @@
 page_title: "pocketid_client Resource - terraform-provider-pocketid"
 subcategory: ""
 description: |-
-  Manages an OIDC client in Pocket-ID. OIDC clients are applications that can authenticate users through Pocket-ID.
+  Manages an OIDC client in Pocket ID. OIDC clients are applications that can authenticate users through Pocket ID.
   ~> Note The client secret is only available during resource creation and cannot be retrieved later. Store it securely.
 ---
 
 # pocketid_client (Resource)
 
-Manages an OIDC client in Pocket-ID. OIDC clients are applications that can authenticate users through Pocket-ID.
+Manages an OIDC client in Pocket ID. OIDC clients are applications that can authenticate users through Pocket ID.
 
 ~> **Note** The client secret is only available during resource creation and cannot be retrieved later. Store it securely.
 
@@ -197,7 +197,7 @@ output "spa_client_id" {
 - `logo_url` (String) URL of the client's logo, downloaded by Pocket ID. When not set, a logo added outside Terraform is left untouched; removing a URL that Terraform set deletes the logo.
 - `logout_callback_urls` (List of String) List of allowed logout callback URLs for the OIDC client.
 - `pkce_enabled` (Boolean) Whether PKCE is enabled for this client. Defaults to true.
-- `requires_pushed_authorization_requests` (Boolean) Whether this client requires Pushed Authorization Requests (PAR, RFC 9126). Defaults to false. Applies to confidential clients only — Pocket-ID coerces this to false for public clients (is_public = true). Enforced only by Pocket-ID versions that support PAR (v2.9.0+); on older versions the value is stored in state but not enforced.
+- `requires_pushed_authorization_requests` (Boolean) Whether this client requires Pushed Authorization Requests (PAR, RFC 9126). Defaults to false. Applies to confidential clients only — Pocket ID coerces this to false for public clients (is_public = true). Enforced only by Pocket ID versions that support PAR (v2.9.0+); on older versions the value is stored in state but not enforced.
 - `requires_reauthentication` (Boolean) Whether this client requires reauthentication for certain flows. Defaults to false.
 
 ### Read-Only

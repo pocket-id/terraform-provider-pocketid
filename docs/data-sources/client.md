@@ -3,12 +3,12 @@
 page_title: "pocketid_client Data Source - terraform-provider-pocketid"
 subcategory: ""
 description: |-
-  Fetches an OIDC client from Pocket-ID by its ID.
+  Fetches an OIDC client from Pocket ID by its ID.
 ---
 
 # pocketid_client (Data Source)
 
-Fetches an OIDC client from Pocket-ID by its ID.
+Fetches an OIDC client from Pocket ID by its ID.
 
 ## Example Usage
 
