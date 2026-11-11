@@ -32,7 +32,7 @@ func TestClientResource_Update(t *testing.T) {
 
 	updateCalled := false
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "PATCH" && r.URL.Path == "/api/v1/clients/client-123" {
+		if r.Method == http.MethodPatch && r.URL.Path == "/api/v1/clients/client-123" {
 			updateCalled = true
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
@@ -350,7 +350,7 @@ func TestClientResource_APIErrors(t *testing.T) {
 				CallbackURLs: []string{"https://example.com"},
 			})
 
-			assert.Error(t, err)
+			require.Error(t, err)
 			assert.Contains(t, err.Error(), tc.expectedError)
 		})
 	}
@@ -371,7 +371,7 @@ func TestUserResource_APIErrors(t *testing.T) {
 		Email:    "test@example.com",
 	})
 
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "Username already exists")
 }
 
@@ -390,6 +390,6 @@ func TestGroupResource_APIErrors(t *testing.T) {
 		FriendlyName: "Test Group",
 	})
 
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "Group name already exists")
 }

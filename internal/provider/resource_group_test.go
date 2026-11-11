@@ -4,8 +4,10 @@
 package provider_test
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/acctest"
@@ -234,7 +236,7 @@ func testAccCheckGroupExists(resourceName string) resource.TestCheckFunc {
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No Group ID is set")
+			return errors.New("No Group ID is set")
 		}
 
 		// Here you would typically make an API call to verify the group exists
@@ -285,9 +287,9 @@ resource "pocketid_group" "second" {
 }
 
 func testAccResourceGroupConfig_customClaims(name, friendlyName string, claims map[string]string) string {
-	var claimLines string
+	var claimLines strings.Builder
 	for k, v := range claims {
-		claimLines += fmt.Sprintf("\n    %q = %q", k, v)
+		fmt.Fprintf(&claimLines, "\n    %q = %q", k, v)
 	}
 	return fmt.Sprintf(`
 resource "pocketid_group" "test" {
@@ -296,7 +298,7 @@ resource "pocketid_group" "test" {
   custom_claims = {%[3]s
   }
 }
-`, name, friendlyName, claimLines)
+`, name, friendlyName, claimLines.String())
 }
 
 func testAccResourceGroupConfig_multipleWithPrefix(rName string) string {

@@ -5,6 +5,7 @@ package provider_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -76,7 +77,7 @@ func checkUnmanagedClientFieldsPreserved(id string) error {
 		return fmt.Errorf("description was reset: got %q, want %q", got.Description, canaryDescription)
 	}
 	if !got.SkipConsent {
-		return fmt.Errorf("skipConsent was reset to false")
+		return errors.New("skipConsent was reset to false")
 	}
 	if got.AccessTokenDurationMinutes != canaryAccessTokenMins {
 		return fmt.Errorf("accessTokenDurationMinutes was reset: got %d, want %d",
@@ -210,7 +211,7 @@ func checkNoClientNamed(name string) error {
 // getClientLogo returns the logo image Pocket ID serves for a client.
 func getClientLogo(id string, light bool) ([]byte, error) {
 	url := fmt.Sprintf("%s/api/oidc/clients/%s/logo?light=%t", os.Getenv("POCKETID_BASE_URL"), id, light)
-	resp, err := http.Get(url)
+	resp, err := http.Get(url) //nolint:gosec,noctx // The URL points at the test instance from POCKETID_BASE_URL
 	if err != nil {
 		return nil, err
 	}

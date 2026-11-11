@@ -50,7 +50,7 @@ func TestGetApplicationConfig(t *testing.T) {
 	assert.Equal(t, "ldapsecret", cfg.LdapBindPassword)
 	assert.Equal(t, "false", cfg.AutoCreateOIDCClientSecret)
 	// Keys not present in the response stay at their zero value.
-	assert.Equal(t, "", cfg.AccentColor)
+	assert.Empty(t, cfg.AccentColor)
 }
 
 func TestUpdateApplicationConfig(t *testing.T) {
@@ -61,8 +61,8 @@ func TestUpdateApplicationConfig(t *testing.T) {
 		assert.Equal(t, "/api/application-configuration", r.URL.Path)
 
 		body, err := io.ReadAll(r.Body)
-		require.NoError(t, err)
-		require.NoError(t, json.Unmarshal(body, &receivedBody))
+		assert.NoError(t, err)
+		assert.NoError(t, json.Unmarshal(body, &receivedBody))
 
 		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode([]client.AppConfigVariable{
@@ -97,8 +97,8 @@ func TestApplicationConfig_EmailSettingModesRoundTrip(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		if r.Method == http.MethodPut {
 			body, err := io.ReadAll(r.Body)
-			require.NoError(t, err)
-			require.NoError(t, json.Unmarshal(body, &receivedBody))
+			assert.NoError(t, err)
+			assert.NoError(t, json.Unmarshal(body, &receivedBody))
 		}
 		// Pocket ID >= 2.19.0 reports modes instead of the old toggles.
 		_ = json.NewEncoder(w).Encode([]client.AppConfigVariable{

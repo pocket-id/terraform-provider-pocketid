@@ -4,6 +4,7 @@
 package provider_test
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"testing"
@@ -117,7 +118,7 @@ func testAccCheckOneTimeAccessTokenValid(resourceName string) resource.TestCheck
 		}
 
 		if rs.Primary.Attributes["token"] == "" {
-			return fmt.Errorf("token is empty")
+			return errors.New("token is empty")
 		}
 
 		return nil
@@ -134,7 +135,7 @@ func testAccCheckOneTimeAccessTokenExpiryInFuture(resourceName string) resource.
 		expiresAt := rs.Primary.Attributes["expires_at"]
 		expiryTime, err := time.Parse(time.RFC3339, expiresAt)
 		if err != nil {
-			return fmt.Errorf("invalid expires_at format: %s", err)
+			return fmt.Errorf("invalid expires_at format: %w", err)
 		}
 		if expiryTime.Before(time.Now()) {
 			return fmt.Errorf("token already expired: %s", expiresAt)

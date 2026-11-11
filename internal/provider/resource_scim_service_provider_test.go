@@ -4,6 +4,7 @@
 package provider_test
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -76,7 +77,7 @@ func testAccCheckScimServiceProviderExists(resourceName string) resource.TestChe
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No SCIM service provider ID is set")
+			return errors.New("No SCIM service provider ID is set")
 		}
 
 		return nil

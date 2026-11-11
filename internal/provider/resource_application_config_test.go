@@ -6,6 +6,7 @@ package provider_test
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"image/color"
 	"io"
@@ -14,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/acctest"
@@ -169,13 +171,13 @@ func getApplicationImage(image client.ApplicationImage) ([]byte, bool, error) {
 	q.Set("default", "false")
 	u.RawQuery = q.Encode()
 
-	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
+	req, err := http.NewRequest(http.MethodGet, u.String(), nil) //nolint:gosec,noctx // The URL points at the test instance from POCKETID_BASE_URL
 	if err != nil {
 		return nil, false, err
 	}
 	req.Header.Set("X-API-KEY", os.Getenv("POCKETID_API_TOKEN"))
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := http.DefaultClient.Do(req) //nolint:gosec // The URL points at the test instance from POCKETID_BASE_URL
 	if err != nil {
 		return nil, false, err
 	}
@@ -211,16 +213,16 @@ func checkApplicationImagesSet(want map[string]bool) resource.TestCheckFunc {
 // testAccResourceApplicationConfigConfig_images renders the configuration
 // with the given image sources, keyed by attribute.
 func testAccResourceApplicationConfigConfig_images(sources map[string]string) string {
-	var images string
+	var images strings.Builder
 	for _, img := range applicationImages {
 		if source, ok := sources[img.attribute]; ok {
-			images += fmt.Sprintf("  %s = {\n    source = %q\n  }\n", img.attribute, source)
+			fmt.Fprintf(&images, "  %s = {\n    source = %q\n  }\n", img.attribute, source)
 		}
 	}
 	return fmt.Sprintf(`
 resource "pocketid_application_config" "test" {
 %s}
-`, images)
+`, images.String())
 }
 
 // TestAccResourceApplicationConfig_images walks every image through its
@@ -231,7 +233,7 @@ func TestAccResourceApplicationConfig_images(t *testing.T) {
 	sources := map[string]string{}
 	for i, img := range applicationImages {
 		sources[img.attribute] = filepath.Join(dir, img.attribute+".png")
-		writeTestPNG(t, sources[img.attribute], color.RGBA{R: uint8(40 * i), G: 100, A: 255})
+		writeTestPNG(t, sources[img.attribute], color.RGBA{R: uint8(40 * i), G: 100, A: 255}) //nolint:gosec // G115 false positive: i is a small loop index
 	}
 	allSet := map[string]bool{}
 	for _, img := range applicationImages {
@@ -280,7 +282,7 @@ func TestAccResourceApplicationConfig_images(t *testing.T) {
 						return err
 					}
 					if bytes.Equal(logo, firstLogo) {
-						return fmt.Errorf("logo was not replaced after the file changed")
+						return errors.New("logo was not replaced after the file changed")
 					}
 					return nil
 				},
@@ -365,7 +367,7 @@ func TestAccResourceApplicationConfig_imageDeletedOutOfBand(t *testing.T) {
 						return err
 					}
 					if !set {
-						return fmt.Errorf("logo deleted outside Terraform was not uploaded again")
+						return errors.New("logo deleted outside Terraform was not uploaded again")
 					}
 					return nil
 				},

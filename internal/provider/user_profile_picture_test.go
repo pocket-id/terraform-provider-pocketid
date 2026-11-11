@@ -40,7 +40,7 @@ func writeTestPNG(t *testing.T, p string, c color.Color) {
 // user: the custom one if set, otherwise the default.
 func getUserProfilePicture(id string) ([]byte, error) {
 	url := fmt.Sprintf("%s/api/users/%s/profile-picture.png", os.Getenv("POCKETID_BASE_URL"), id)
-	resp, err := http.Get(url)
+	resp, err := http.Get(url) //nolint:gosec,noctx // The URL points at the test instance from POCKETID_BASE_URL
 	if err != nil {
 		return nil, err
 	}

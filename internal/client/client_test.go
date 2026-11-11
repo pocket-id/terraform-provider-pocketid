@@ -7,6 +7,7 @@ import (
 	"mime"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 	"time"
 
@@ -63,11 +64,11 @@ func TestNewClient(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c, err := client.NewClient(tt.baseURL, tt.apiToken, tt.skipTLSVerify, tt.timeout)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				assert.Contains(t, err.Error(), tt.errMsg)
 				assert.Nil(t, c)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.NotNil(t, c)
 			}
 		})
@@ -94,7 +95,7 @@ func TestClient_CreateClient(t *testing.T) {
 
 		var req client.OIDCClientCreateRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, "Test Client", req.Name)
 		assert.Equal(t, []string{"https://example.com/callback"}, req.CallbackURLs)
 
@@ -119,7 +120,7 @@ func TestClient_CreateClient(t *testing.T) {
 	}
 
 	result, err := c.CreateClient(t.Context(), createReq)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expectedClient, result)
 }
 
@@ -168,7 +169,7 @@ func TestClient_GetClient(t *testing.T) {
 	require.NoError(t, err)
 
 	result, err := c.GetClient(t.Context(), "test-client-id")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expectedClient, result)
 }
 
@@ -191,7 +192,7 @@ func TestClient_UpdateClient(t *testing.T) {
 
 		var req client.OIDCClientCreateRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, "Updated Client", req.Name)
 
 		w.Header().Set("Content-Type", "application/json")
@@ -215,7 +216,7 @@ func TestClient_UpdateClient(t *testing.T) {
 	}
 
 	result, err := c.UpdateClient(t.Context(), "test-client-id", updateReq)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expectedClient, result)
 }
 
@@ -271,7 +272,7 @@ func TestClient_ListClients(t *testing.T) {
 	require.NoError(t, err)
 
 	result, err := c.ListClients(t.Context())
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expectedResponse, result)
 }
 
@@ -309,7 +310,7 @@ func TestClient_ListUserGroups_FetchesAllPages(t *testing.T) {
 
 		requested = append(requested, r.URL.RawQuery)
 		response, ok := pages[r.URL.Query().Get("pagination[page]")]
-		require.True(t, ok, "unexpected page query %q", r.URL.RawQuery)
+		assert.True(t, ok, "unexpected page query %q", r.URL.RawQuery)
 		if r.URL.Query().Get("pagination[page]") != "" {
 			assert.Equal(t, "2", r.URL.Query().Get("pagination[limit]"))
 		}
@@ -374,7 +375,7 @@ func TestClient_ListUsers_StopsWhenPaginationIsIgnored(t *testing.T) {
 }
 
 func TestClient_GenerateClientSecret(t *testing.T) {
-	expectedSecret := "new-client-secret-123"
+	expectedSecret := "new-client-secret-123" //nolint:gosec // G101 false positive: test fixture, not a credential
 
 	tests := []struct {
 		name             string
@@ -417,10 +418,10 @@ func TestClient_GenerateClientSecret(t *testing.T) {
 					assert.Equal(t, "POST", r.Method)
 
 					bodyBytes, err := io.ReadAll(r.Body)
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					if len(bodyBytes) > 0 {
 						var req client.ClientSecretRequest
-						require.NoError(t, json.Unmarshal(bodyBytes, &req))
+						assert.NoError(t, json.Unmarshal(bodyBytes, &req))
 						assert.Equal(t, tt.customSecret, req.Secret)
 					}
 
@@ -439,7 +440,7 @@ func TestClient_GenerateClientSecret(t *testing.T) {
 			require.NoError(t, err)
 
 			secret, err := c.GenerateClientSecret(t.Context(), "test-client-id", tt.customSecret)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, expectedSecret, secret.Secret)
 		})
 	}
@@ -499,7 +500,7 @@ func TestClient_ErrorHandling(t *testing.T) {
 			require.NoError(t, err)
 
 			_, err = c.GetClient(t.Context(), "test-client-id")
-			assert.Error(t, err)
+			require.Error(t, err)
 			assert.Contains(t, err.Error(), tt.expectedErrMsg)
 		})
 	}
@@ -532,7 +533,7 @@ func TestClient_RetryLogic(t *testing.T) {
 	require.NoError(t, err)
 
 	result, err := c.GetClient(t.Context(), "test-client-id")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, result)
 	assert.Equal(t, "test-client-id", result.ID)
 	assert.Equal(t, 3, attempts, "Should have made 3 attempts")
@@ -554,7 +555,7 @@ func TestClient_RetryExhaustion(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = c.GetClient(t.Context(), "test-client-id")
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "request failed after 4 attempts")
 	assert.Equal(t, 4, attempts, "Should have made 4 attempts (initial + 3 retries)")
 }
@@ -575,7 +576,7 @@ func TestClient_NonRetryableError(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = c.GetClient(t.Context(), "test-client-id")
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "HTTP 404: Not found")
 	assert.Equal(t, 1, attempts, "Should have made only 1 attempt (no retries for 404)")
 }
@@ -616,7 +617,7 @@ func TestClient_CreateUser(t *testing.T) {
 
 		var req client.UserCreateRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, "testuser", req.Username)
 		assert.Equal(t, "test@example.com", req.Email)
 
@@ -638,7 +639,7 @@ func TestClient_CreateUser(t *testing.T) {
 	}
 
 	result, err := c.CreateUser(t.Context(), createReq)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expectedUser, result)
 }
 
@@ -656,7 +657,7 @@ func TestClient_CreateUserGroup(t *testing.T) {
 
 		var req client.UserGroupCreateRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, "test-group", req.Name)
 		assert.Equal(t, "Test Group", req.FriendlyName)
 
@@ -676,7 +677,7 @@ func TestClient_CreateUserGroup(t *testing.T) {
 	}
 
 	result, err := c.CreateUserGroup(t.Context(), createReq)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expectedGroup, result)
 }
 
@@ -687,7 +688,7 @@ func TestClient_UpdateUserGroups(t *testing.T) {
 
 		var req client.UpdateUserGroupsRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, []string{"group1", "group2"}, req.UserGroupIDs)
 
 		w.WriteHeader(http.StatusOK)
@@ -708,7 +709,7 @@ func TestClient_UpdateUserCustomClaims(t *testing.T) {
 
 		var req []client.CustomClaim
 		err := json.NewDecoder(r.Body).Decode(&req)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, []client.CustomClaim{
 			{Key: "department", Value: "engineering"},
 			{Key: "level", Value: "senior"},
@@ -831,7 +832,7 @@ func TestClient_UpdateUserCustomClaims_Clear(t *testing.T) {
 
 		// A nil slice must serialize as an empty array, not null.
 		body, err := io.ReadAll(r.Body)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, "[]", string(body))
 
 		w.WriteHeader(http.StatusOK)
@@ -854,7 +855,7 @@ func TestClient_UpdateGroupCustomClaims(t *testing.T) {
 
 		var req []client.CustomClaim
 		err := json.NewDecoder(r.Body).Decode(&req)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, []client.CustomClaim{{Key: "role", Value: "admin"}}, req)
 
 		w.WriteHeader(http.StatusOK)
@@ -879,7 +880,7 @@ func TestClient_UpdateClientAllowedUserGroups(t *testing.T) {
 
 		var req client.UpdateAllowedUserGroupsRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, []string{"group1", "group2"}, req.UserGroupIDs)
 
 		w.WriteHeader(http.StatusOK)
@@ -925,13 +926,13 @@ func TestClient_RateLimitHandling(t *testing.T) {
 	result, err := c.GetClient(t.Context(), "test-client-id")
 	elapsed := time.Since(start)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, result)
 	assert.Equal(t, "test-client-id", result.ID)
 	assert.Equal(t, "Test Client", result.Name)
 	assert.Equal(t, 3, attempts)
 	// Should have waited at least 2 seconds (2 retries with 1 second each)
-	assert.True(t, elapsed >= 2*time.Second, "Expected at least 2 seconds elapsed, got %v", elapsed)
+	assert.GreaterOrEqual(t, elapsed, 2*time.Second, "Expected at least 2 seconds elapsed, got %v", elapsed)
 }
 
 func TestClient_RateLimitWithoutRetryAfter(t *testing.T) {
@@ -963,7 +964,7 @@ func TestClient_RateLimitWithoutRetryAfter(t *testing.T) {
 
 	result, err := c.GetClient(t.Context(), "test-client-id")
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, result)
 	assert.Equal(t, "test-client-id", result.ID)
 	assert.Equal(t, 2, attempts)
@@ -993,14 +994,14 @@ func TestClient_CreateOneTimeAccessToken(t *testing.T) {
 	require.NoError(t, err)
 
 	token, err := c.CreateOneTimeAccessToken(t.Context(), "test-user-id", &client.OneTimeAccessTokenRequest{TTL: "15m"})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "test-token-123456", token.Token)
 }
 
 func TestClient_CreateOneTimeAccessToken_SendsTTL(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var body map[string]any
-		require.NoError(t, json.NewDecoder(r.Body).Decode(&body))
+		assert.NoError(t, json.NewDecoder(r.Body).Decode(&body))
 		// The provider must send the lifetime as a "ttl" duration string.
 		assert.Equal(t, "1h", body["ttl"])
 		_, hasExpiresAt := body["expiresAt"]
@@ -1017,7 +1018,7 @@ func TestClient_CreateOneTimeAccessToken_SendsTTL(t *testing.T) {
 	require.NoError(t, err)
 
 	token, err := c.CreateOneTimeAccessToken(t.Context(), "test-user-id", &client.OneTimeAccessTokenRequest{TTL: "1h"})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "tok", token.Token)
 }
 
@@ -1037,7 +1038,7 @@ func TestClient_CreateOneTimeAccessToken_Error(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = c.CreateOneTimeAccessToken(t.Context(), "test-user-id", &client.OneTimeAccessTokenRequest{TTL: "1s"})
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "invalid ttl")
 }
 
@@ -1047,7 +1048,7 @@ func TestClient_CreateScimServiceProvider(t *testing.T) {
 		assert.Equal(t, "/api/scim/service-provider", r.URL.Path)
 
 		var req client.ScimServiceProviderCreateRequest
-		require.NoError(t, json.NewDecoder(r.Body).Decode(&req))
+		assert.NoError(t, json.NewDecoder(r.Body).Decode(&req))
 		assert.Equal(t, "https://scim.example.com/v2", req.Endpoint)
 		assert.Equal(t, "secret-token", req.Token)
 		assert.Equal(t, "client-123", req.OidcClientID)
@@ -1076,7 +1077,7 @@ func TestClient_CreateScimServiceProvider(t *testing.T) {
 		Token:        "secret-token",
 		OidcClientID: "client-123",
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "scim-1", result.ID)
 	assert.Equal(t, "secret-token", result.Token)
 	require.NotNil(t, result.OidcClient)
@@ -1107,7 +1108,7 @@ func TestClient_GetClientScimServiceProvider(t *testing.T) {
 	require.NoError(t, err)
 
 	result, err := c.GetClientScimServiceProvider(t.Context(), "client-123")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "scim-1", result.ID)
 	assert.Equal(t, "decrypted-token", result.Token)
 	assert.Equal(t, "https://scim.example.com/v2", result.Endpoint)
@@ -1119,7 +1120,7 @@ func TestClient_UpdateScimServiceProvider(t *testing.T) {
 		assert.Equal(t, "/api/scim/service-provider/scim-1", r.URL.Path)
 
 		var req client.ScimServiceProviderCreateRequest
-		require.NoError(t, json.NewDecoder(r.Body).Decode(&req))
+		assert.NoError(t, json.NewDecoder(r.Body).Decode(&req))
 		assert.Equal(t, "https://scim.example.com/v2/updated", req.Endpoint)
 
 		w.Header().Set("Content-Type", "application/json")
@@ -1141,7 +1142,7 @@ func TestClient_UpdateScimServiceProvider(t *testing.T) {
 		Token:        "new-token",
 		OidcClientID: "client-123",
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "https://scim.example.com/v2/updated", result.Endpoint)
 }
 
@@ -1206,7 +1207,7 @@ func TestClient_RequireMinVersion(t *testing.T) {
 
 			err = c.RequireMinVersion(t.Context(), "test feature", tt.minVersion)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				if tt.errContains != "" {
 					assert.Contains(t, err.Error(), tt.errContains)
 				}
@@ -1250,7 +1251,7 @@ func TestClient_RequireMinVersion_VersionEndpointError(t *testing.T) {
 	require.NoError(t, err)
 
 	err = c.RequireMinVersion(t.Context(), "test feature", "2.12.0")
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "could not determine")
 }
 
@@ -1343,7 +1344,7 @@ func TestClient_DeleteClientLogo(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				assert.Equal(t, "DELETE", r.Method)
 				assert.Equal(t, "/api/oidc/clients/c1/logo", r.URL.Path)
-				assert.Equal(t, fmt.Sprintf("%t", tt.light), r.URL.Query().Get("light"))
+				assert.Equal(t, strconv.FormatBool(tt.light), r.URL.Query().Get("light"))
 				w.WriteHeader(tt.status)
 			}))
 			defer server.Close()

@@ -44,7 +44,7 @@ func TestClient_GetUser(t *testing.T) {
 	require.NoError(t, err)
 
 	result, err := c.GetUser(t.Context(), "test-user-id")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expectedUser, result)
 }
 
@@ -61,7 +61,7 @@ func TestClient_GetUser_Error(t *testing.T) {
 	require.NoError(t, err)
 
 	result, err := c.GetUser(t.Context(), "nonexistent-id")
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "HTTP 404")
 }
@@ -94,7 +94,7 @@ func TestClient_UpdateUser(t *testing.T) {
 
 		var req client.UserCreateRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, updateReq, &req)
 
 		w.Header().Set("Content-Type", "application/json")
@@ -108,7 +108,7 @@ func TestClient_UpdateUser(t *testing.T) {
 	require.NoError(t, err)
 
 	result, err := c.UpdateUser(t.Context(), "test-user-id", updateReq)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expectedUser, result)
 }
 
@@ -141,7 +141,7 @@ func TestClient_DeleteUser_Error(t *testing.T) {
 	require.NoError(t, err)
 
 	err = c.DeleteUser(t.Context(), "test-user-id")
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "HTTP 403")
 }
 
@@ -193,7 +193,7 @@ func TestClient_ListUsers(t *testing.T) {
 	require.NoError(t, err)
 
 	result, err := c.ListUsers(t.Context())
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expectedResponse, result)
 	assert.Equal(t, expectedUsers, result.Data)
 }
@@ -224,7 +224,7 @@ func TestClient_ListUsers_Empty(t *testing.T) {
 	require.NoError(t, err)
 
 	result, err := c.ListUsers(t.Context())
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expectedResponse, result)
 	assert.Empty(t, result.Data)
 }
@@ -251,7 +251,7 @@ func TestClient_GetUserGroup(t *testing.T) {
 	require.NoError(t, err)
 
 	result, err := c.GetUserGroup(t.Context(), "test-group-id")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expectedGroup, result)
 }
 
@@ -268,7 +268,7 @@ func TestClient_GetUserGroup_NotFound(t *testing.T) {
 	require.NoError(t, err)
 
 	result, err := c.GetUserGroup(t.Context(), "nonexistent-id")
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "HTTP 404")
 }
@@ -291,7 +291,7 @@ func TestClient_UpdateUserGroup(t *testing.T) {
 
 		var req client.UserGroupCreateRequest
 		err := json.NewDecoder(r.Body).Decode(&req)
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, updateReq, &req)
 
 		w.Header().Set("Content-Type", "application/json")
@@ -305,7 +305,7 @@ func TestClient_UpdateUserGroup(t *testing.T) {
 	require.NoError(t, err)
 
 	result, err := c.UpdateUserGroup(t.Context(), "test-group-id", updateReq)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expectedGroup, result)
 }
 
@@ -338,7 +338,7 @@ func TestClient_DeleteUserGroup_InUse(t *testing.T) {
 	require.NoError(t, err)
 
 	err = c.DeleteUserGroup(t.Context(), "test-group-id")
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "HTTP 409")
 }
 
@@ -386,7 +386,7 @@ func TestClient_ListUserGroups(t *testing.T) {
 	require.NoError(t, err)
 
 	result, err := c.ListUserGroups(t.Context())
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expectedResponse, result)
 	assert.Equal(t, expectedGroups, result.Data)
 }
@@ -404,7 +404,7 @@ func TestClient_ListUserGroups_Error(t *testing.T) {
 	require.NoError(t, err)
 
 	result, err := c.ListUserGroups(t.Context())
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "HTTP 500")
 }

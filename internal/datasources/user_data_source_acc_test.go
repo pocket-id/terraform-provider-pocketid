@@ -13,7 +13,7 @@ import (
 
 func TestAccUserDataSource_displayNameAndEmailVerified(t *testing.T) {
 	rName := acctest.RandomWithPrefix("tf-acc-test")
-	email := fmt.Sprintf("%s@example.com", rName)
+	email := rName + "@example.com"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -34,7 +34,7 @@ func TestAccUserDataSource_displayNameAndEmailVerified(t *testing.T) {
 
 func TestAccUsersDataSource_displayNameAndEmailVerified(t *testing.T) {
 	rName := acctest.RandomWithPrefix("tf-acc-test")
-	email := fmt.Sprintf("%s@example.com", rName)
+	email := rName + "@example.com"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },

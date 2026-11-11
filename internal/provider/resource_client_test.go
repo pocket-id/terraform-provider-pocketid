@@ -6,6 +6,7 @@ package provider_test
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -493,7 +494,7 @@ func testAccCheckClientSecretNotEmpty(resourceName string) resource.TestCheckFun
 
 		secret := rs.Primary.Attributes["client_secret"]
 		if secret == "" {
-			return fmt.Errorf("client_secret is empty")
+			return errors.New("client_secret is empty")
 		}
 
 		return nil
@@ -748,7 +749,7 @@ func TestAccResourceClient_secretRotationRevokesPrevious(t *testing.T) {
 					// The tracked id must have moved on from the first secret.
 					resource.TestCheckResourceAttrWith(resourceName, "client_secret_id", func(v string) error {
 						if v == firstSecretID {
-							return fmt.Errorf("client_secret_id did not change after rotation")
+							return errors.New("client_secret_id did not change after rotation")
 						}
 						return nil
 					}),
@@ -841,7 +842,7 @@ func TestAccResourceClient_logoURL(t *testing.T) {
 							return err
 						}
 						if bytes.Equal(logo, firstLogo) {
-							return fmt.Errorf("logo was not replaced after logo_url changed")
+							return errors.New("logo was not replaced after logo_url changed")
 						}
 						return nil
 					},

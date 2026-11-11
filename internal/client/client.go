@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -59,10 +60,10 @@ func (e *RateLimitError) Error() string {
 // NewClient creates a new Pocket-ID API client
 func NewClient(baseURL, apiToken string, skipTLSVerify bool, timeout int64) (*Client, error) {
 	if baseURL == "" {
-		return nil, fmt.Errorf("base URL is required")
+		return nil, errors.New("base URL is required")
 	}
 	if apiToken == "" {
-		return nil, fmt.Errorf("API token is required")
+		return nil, errors.New("API token is required")
 	}
 
 	// Configure HTTP client with TLS settings
@@ -176,7 +177,8 @@ func (c *Client) doRawRequest(ctx context.Context, method, endpoint, contentType
 			backoff = time.Duration(1<<(attempt-1)) * time.Second
 
 			// Special handling for rate limit errors to respect Retry-After header
-			if rateLimitErr, ok := lastErr.(*RateLimitError); ok && rateLimitErr.RetryAfter != "" {
+			rateLimitErr := &RateLimitError{}
+			if errors.As(lastErr, &rateLimitErr) && rateLimitErr.RetryAfter != "" {
 				retryAfterSeconds := parseRetryAfter(rateLimitErr.RetryAfter)
 				if retryAfterSeconds > 0 {
 					backoff = time.Duration(retryAfterSeconds) * time.Second
@@ -270,11 +272,8 @@ func isRetryableError(err error) bool {
 	}
 
 	// Check if it's a RateLimitError
-	if _, ok := err.(*RateLimitError); ok {
-		return true
-	}
-
-	return false
+	rateLimitError := &RateLimitError{}
+	return errors.As(err, &rateLimitError)
 }
 
 // doSingleRequest performs a single HTTP request without retries
@@ -360,7 +359,7 @@ func (c *Client) doSingleRequest(ctx context.Context, method, endpoint, contentT
 				"raw_body":    string(respBody),
 			})
 			// Handle rate limit errors with Retry-After header
-			if resp.StatusCode == 429 {
+			if resp.StatusCode == http.StatusTooManyRequests {
 				retryAfter := resp.Header.Get("Retry-After")
 				return nil, &RateLimitError{
 					StatusCode: resp.StatusCode,
@@ -375,7 +374,7 @@ func (c *Client) doSingleRequest(ctx context.Context, method, endpoint, contentT
 			"error":       errResp.Error,
 		})
 		// Handle rate limit errors with Retry-After header
-		if resp.StatusCode == 429 {
+		if resp.StatusCode == http.StatusTooManyRequests {
 			retryAfter := resp.Header.Get("Retry-After")
 			return nil, &RateLimitError{
 				StatusCode: resp.StatusCode,
@@ -428,7 +427,7 @@ func (c *Client) CreateClient(ctx context.Context, createReq *OIDCClientCreateRe
 
 // GetClient retrieves an OIDC client by ID
 func (c *Client) GetClient(ctx context.Context, clientID string) (*OIDCClient, error) {
-	body, err := c.doRequest(ctx, "GET", fmt.Sprintf("/api/oidc/clients/%s", clientID), nil)
+	body, err := c.doRequest(ctx, "GET", "/api/oidc/clients/"+clientID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -443,7 +442,7 @@ func (c *Client) GetClient(ctx context.Context, clientID string) (*OIDCClient, e
 
 // UpdateClient updates an existing OIDC client
 func (c *Client) UpdateClient(ctx context.Context, clientID string, updateReq *OIDCClientCreateRequest) (*OIDCClient, error) {
-	body, err := c.doRequest(ctx, "PUT", fmt.Sprintf("/api/oidc/clients/%s", clientID), updateReq)
+	body, err := c.doRequest(ctx, "PUT", "/api/oidc/clients/"+clientID, updateReq)
 	if err != nil {
 		return nil, err
 	}
@@ -458,7 +457,7 @@ func (c *Client) UpdateClient(ctx context.Context, clientID string, updateReq *O
 
 // DeleteClient deletes an OIDC client
 func (c *Client) DeleteClient(ctx context.Context, clientID string) error {
-	_, err := c.doRequest(ctx, "DELETE", fmt.Sprintf("/api/oidc/clients/%s", clientID), nil)
+	_, err := c.doRequest(ctx, "DELETE", "/api/oidc/clients/"+clientID, nil)
 	return err
 }
 
@@ -611,7 +610,7 @@ func (c *Client) CreateUser(ctx context.Context, user *UserCreateRequest) (*User
 
 // GetUser retrieves a user by ID
 func (c *Client) GetUser(ctx context.Context, userID string) (*User, error) {
-	body, err := c.doRequest(ctx, "GET", fmt.Sprintf("/api/users/%s", userID), nil)
+	body, err := c.doRequest(ctx, "GET", "/api/users/"+userID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -626,7 +625,7 @@ func (c *Client) GetUser(ctx context.Context, userID string) (*User, error) {
 
 // UpdateUser updates an existing user
 func (c *Client) UpdateUser(ctx context.Context, userID string, user *UserCreateRequest) (*User, error) {
-	body, err := c.doRequest(ctx, "PUT", fmt.Sprintf("/api/users/%s", userID), user)
+	body, err := c.doRequest(ctx, "PUT", "/api/users/"+userID, user)
 	if err != nil {
 		return nil, err
 	}
@@ -641,7 +640,7 @@ func (c *Client) UpdateUser(ctx context.Context, userID string, user *UserCreate
 
 // DeleteUser deletes a user
 func (c *Client) DeleteUser(ctx context.Context, userID string) error {
-	_, err := c.doRequest(ctx, "DELETE", fmt.Sprintf("/api/users/%s", userID), nil)
+	_, err := c.doRequest(ctx, "DELETE", "/api/users/"+userID, nil)
 	return err
 }
 
@@ -683,7 +682,7 @@ func (c *Client) UpdateUserCustomClaims(ctx context.Context, userID string, clai
 	if claims == nil {
 		claims = []CustomClaim{}
 	}
-	body, err := c.doRequest(ctx, "PUT", fmt.Sprintf("/api/custom-claims/user/%s", userID), claims)
+	body, err := c.doRequest(ctx, "PUT", "/api/custom-claims/user/"+userID, claims)
 	if err != nil {
 		return nil, err
 	}
@@ -715,7 +714,7 @@ func (c *Client) CreateUserGroup(ctx context.Context, group *UserGroupCreateRequ
 
 // GetUserGroup retrieves a user group by ID
 func (c *Client) GetUserGroup(ctx context.Context, groupID string) (*UserGroup, error) {
-	body, err := c.doRequest(ctx, "GET", fmt.Sprintf("/api/user-groups/%s", groupID), nil)
+	body, err := c.doRequest(ctx, "GET", "/api/user-groups/"+groupID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -730,7 +729,7 @@ func (c *Client) GetUserGroup(ctx context.Context, groupID string) (*UserGroup, 
 
 // UpdateUserGroup updates an existing user group
 func (c *Client) UpdateUserGroup(ctx context.Context, groupID string, group *UserGroupCreateRequest) (*UserGroup, error) {
-	body, err := c.doRequest(ctx, "PUT", fmt.Sprintf("/api/user-groups/%s", groupID), group)
+	body, err := c.doRequest(ctx, "PUT", "/api/user-groups/"+groupID, group)
 	if err != nil {
 		return nil, err
 	}
@@ -745,7 +744,7 @@ func (c *Client) UpdateUserGroup(ctx context.Context, groupID string, group *Use
 
 // DeleteUserGroup deletes a user group
 func (c *Client) DeleteUserGroup(ctx context.Context, groupID string) error {
-	_, err := c.doRequest(ctx, "DELETE", fmt.Sprintf("/api/user-groups/%s", groupID), nil)
+	_, err := c.doRequest(ctx, "DELETE", "/api/user-groups/"+groupID, nil)
 	return err
 }
 
@@ -760,7 +759,7 @@ func (c *Client) UpdateGroupCustomClaims(ctx context.Context, groupID string, cl
 	if claims == nil {
 		claims = []CustomClaim{}
 	}
-	body, err := c.doRequest(ctx, "PUT", fmt.Sprintf("/api/custom-claims/user-group/%s", groupID), claims)
+	body, err := c.doRequest(ctx, "PUT", "/api/custom-claims/user-group/"+groupID, claims)
 	if err != nil {
 		return nil, err
 	}
@@ -952,7 +951,7 @@ func (c *Client) GetClientScimServiceProvider(ctx context.Context, clientID stri
 
 // UpdateScimServiceProvider updates an existing SCIM service provider configuration.
 func (c *Client) UpdateScimServiceProvider(ctx context.Context, id string, req *ScimServiceProviderCreateRequest) (*ScimServiceProvider, error) {
-	body, err := c.doRequest(ctx, "PUT", fmt.Sprintf("/api/scim/service-provider/%s", id), req)
+	body, err := c.doRequest(ctx, "PUT", "/api/scim/service-provider/"+id, req)
 	if err != nil {
 		return nil, err
 	}
@@ -967,7 +966,7 @@ func (c *Client) UpdateScimServiceProvider(ctx context.Context, id string, req *
 
 // DeleteScimServiceProvider deletes a SCIM service provider configuration by ID.
 func (c *Client) DeleteScimServiceProvider(ctx context.Context, id string) error {
-	_, err := c.doRequest(ctx, "DELETE", fmt.Sprintf("/api/scim/service-provider/%s", id), nil)
+	_, err := c.doRequest(ctx, "DELETE", "/api/scim/service-provider/"+id, nil)
 	return err
 }
 

@@ -196,11 +196,12 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 	if displayName == "" {
 		firstName := plan.FirstName.ValueString()
 		lastName := plan.LastName.ValueString()
-		if firstName != "" && lastName != "" {
+		switch {
+		case firstName != "" && lastName != "":
 			displayName = firstName + " " + lastName
-		} else if firstName != "" {
+		case firstName != "":
 			displayName = firstName
-		} else if lastName != "" {
+		case lastName != "":
 			displayName = lastName
 		}
 	}
@@ -267,13 +268,11 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 
 	plan.Disabled = types.BoolValue(userResp.Disabled)
 
-	// Handle locale
-	if userResp.Locale != nil && *userResp.Locale != "" {
+	// The planned locale is kept when the API doesn't return it in the create response
+	switch {
+	case userResp.Locale != nil && *userResp.Locale != "":
 		plan.Locale = types.StringValue(*userResp.Locale)
-	} else if plan.Locale.ValueString() != "" {
-		// Keep the planned value if API returns empty but plan had a value
-		// This handles cases where the API might not return locale in create response
-	} else {
+	case plan.Locale.ValueString() == "":
 		plan.Locale = types.StringNull()
 	}
 
@@ -437,11 +436,12 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 	if displayName == "" {
 		firstName := plan.FirstName.ValueString()
 		lastName := plan.LastName.ValueString()
-		if firstName != "" && lastName != "" {
+		switch {
+		case firstName != "" && lastName != "":
 			displayName = firstName + " " + lastName
-		} else if firstName != "" {
+		case firstName != "":
 			displayName = firstName
-		} else if lastName != "" {
+		case lastName != "":
 			displayName = lastName
 		}
 	}

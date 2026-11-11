@@ -8,7 +8,6 @@ on:
 
 env:
   GO_VERSION: "1.25"
-  GOLANGCI_LINT_VERSION: "v2.12.2"
 
 permissions:
   contents: read
@@ -37,6 +36,7 @@ jobs:
               - 'go.mod'
               - 'go.sum'
               - '.golangci.yml'
+              - '.golangci-lint-version'
               # Re-run the integration suite when the test harness or this
               # workflow changes, so harness/CI edits are actually validated.
               - 'scripts/**'
@@ -73,12 +73,13 @@ jobs:
               - 'go.mod'
               - 'go.sum'
               - '.golangci.yml'
+              - '.golangci-lint-version'
 
       - name: Run golangci-lint
         if: steps.filter.outputs.go == 'true'
         uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
         with:
-          version: ${{ env.GOLANGCI_LINT_VERSION }}
+          version-file: .golangci-lint-version
 
       - name: Check code formatting
         if: steps.filter.outputs.go == 'true'

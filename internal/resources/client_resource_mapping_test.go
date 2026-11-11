@@ -57,7 +57,7 @@ func TestBuildCreateRequestFromPlan(t *testing.T) {
 		assert.Equal(t, "https://issuer.example.com", req.Credentials.FederatedIdentities[0].Issuer)
 		assert.Equal(t, "subject-1", req.Credentials.FederatedIdentities[0].Subject)
 		assert.Equal(t, "audience-1", req.Credentials.FederatedIdentities[0].Audience)
-		assert.Equal(t, "", req.Credentials.FederatedIdentities[0].JWKS)
+		assert.Empty(t, req.Credentials.FederatedIdentities[0].JWKS)
 	}
 }
 
@@ -87,7 +87,7 @@ func TestMapAPIClientToModel(t *testing.T) {
 
 	assert.Equal(t, "client-1", model.ID.ValueString())
 	assert.Equal(t, "API Client", model.Name.ValueString())
-	assert.Equal(t, true, model.RequiresReauthentication.ValueBool())
+	assert.True(t, model.RequiresReauthentication.ValueBool())
 	assert.Equal(t, "https://example.com/launch", model.LaunchURL.ValueString())
 	assert.False(t, model.HasLogo.ValueBool())
 	assert.True(t, model.HasDarkLogo.ValueBool())

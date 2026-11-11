@@ -5,11 +5,13 @@ package provider_test
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"image/color"
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -212,7 +214,7 @@ func testAccCheckUserGroupsSet(resourceName string) resource.TestCheckFunc {
 
 		// Verify we have the expected number of unique groups
 		if len(groups) != groupCount {
-			return fmt.Errorf("duplicate groups found in state")
+			return errors.New("duplicate groups found in state")
 		}
 
 		return nil
@@ -231,9 +233,9 @@ resource "pocketid_user" "test" {
 }
 
 func testAccResourceUserConfig_customClaims(username, email string, claims map[string]string) string {
-	var claimLines string
+	var claimLines strings.Builder
 	for k, v := range claims {
-		claimLines += fmt.Sprintf("\n    %q = %q", k, v)
+		fmt.Fprintf(&claimLines, "\n    %q = %q", k, v)
 	}
 	return fmt.Sprintf(`
 resource "pocketid_user" "test" {
@@ -244,7 +246,7 @@ resource "pocketid_user" "test" {
   custom_claims = {%[3]s
   }
 }
-`, username, email, claimLines)
+`, username, email, claimLines.String())
 }
 
 func testAccResourceUserConfig_displayNameDefault(username, email string) string {
@@ -652,7 +654,7 @@ func TestAccResourceUser_profilePicture(t *testing.T) {
 					resource.TestCheckResourceAttrSet(resourceName, "profile_picture.sha256"),
 					servedPicture("custom", func(got []byte) error {
 						if bytes.Equal(got, defaultPicture) {
-							return fmt.Errorf("still the default")
+							return errors.New("still the default")
 						}
 						firstPicture = got
 						return nil
@@ -679,7 +681,7 @@ func TestAccResourceUser_profilePicture(t *testing.T) {
 				},
 				Check: servedPicture("replaced", func(got []byte) error {
 					if bytes.Equal(got, firstPicture) {
-						return fmt.Errorf("still the first picture")
+						return errors.New("still the first picture")
 					}
 					return nil
 				}),
@@ -696,7 +698,7 @@ func TestAccResourceUser_profilePicture(t *testing.T) {
 					resource.TestCheckNoResourceAttr(resourceName, "profile_picture.source"),
 					servedPicture("default again", func(got []byte) error {
 						if !bytes.Equal(got, defaultPicture) {
-							return fmt.Errorf("not reset to the default")
+							return errors.New("not reset to the default")
 						}
 						return nil
 					}),
@@ -752,7 +754,7 @@ func TestAccResourceUser_unmanagedProfilePicturePreserved(t *testing.T) {
 						return err
 					}
 					if bytes.Equal(got, defaultPicture) {
-						return fmt.Errorf("the picture uploaded outside Terraform was reset")
+						return errors.New("the picture uploaded outside Terraform was reset")
 					}
 					return nil
 				},
