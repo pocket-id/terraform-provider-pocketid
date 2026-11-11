@@ -322,11 +322,6 @@ Contributions are welcome! Please see our [Contributing Guidelines](CONTRIBUTING
 
 ## Security
 
-### Reporting Security Issues
-
-Please report security vulnerabilities to [security@leer.dev](mailto:security@leer.dev). Do not open public issues for
-security problems.
-
 ### Best Practices
 
 1. **Never commit API tokens** to version control
