@@ -1,11 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Terraform Provider Registry
-    url: https://registry.terraform.io/providers/pocket-id/pocketid/latest
-    about: View the provider documentation on the Terraform Registry
-  - name: Community Discussion
-    url: https://github.com/pocket-id/terraform-provider-pocketid/discussions
-    about: Ask questions and discuss ideas with the community
-  - name: Provider Development Guide
-    url: https://developer.hashicorp.com/terraform/plugin/sdkv2
-    about: Learn how to contribute to Terraform provider development
+  - name: 💬 Discord
+    url: https://discord.gg/8wudU9KaxM
+    about: For help and chatting with the community
