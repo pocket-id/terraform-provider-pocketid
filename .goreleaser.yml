@@ -1,42 +1,16 @@
-# .goreleaser.yml
-# Configuration for GoReleaser
-# Documentation: https://goreleaser.com
-
 version: 2
 
 project_name: terraform-provider-pocketid
 
-# This is an example .goreleaser.yml file with some sensible defaults.
-# Make sure to check the documentation at https://goreleaser.com
-
-# Git configuration
-git:
-  # Ignore dev pre-release tags when resolving the previous/current tag.
-  # The cleanup-on-tag-push workflow deletes these tags during a release, so
-  # using one as the changelog base produces a 404 against the GitHub compare
-  # API. Ignoring them makes the previous tag resolve to the last stable release.
-  ignore_tags:
-    - "*-dev*"
-
-before:
-  hooks:
-    # You may remove this if you don't use go modules.
-    - go mod tidy
-    # Generate documentation
-    - go install github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@latest
-    - tfplugindocs generate
-
-# Build configuration
 builds:
-  - id: terraform-provider-pocketid
-    binary: "{{ .ProjectName }}_v{{ .Version }}"
+  - binary: "{{ .ProjectName }}_v{{ .Version }}"
     env:
       - CGO_ENABLED=0
     mod_timestamp: "{{ .CommitTimestamp }}"
     flags:
       - -trimpath
     ldflags:
-      - "-s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}"
+      - "-s -w -X main.version={{ .Version }}"
     goos:
       - darwin
       - linux
@@ -46,31 +20,26 @@ builds:
       - amd64
       - arm64
       - arm
-      - 386
+      - "386"
     goarm:
       - "6"
       - "7"
     ignore:
-      # Windows doesn't support ARM
       - goos: windows
         goarch: arm64
       - goos: windows
         goarch: arm
-      # Darwin doesn't support 386 or ARMv6/v7
       - goos: darwin
-        goarch: 386
+        goarch: "386"
       - goos: darwin
         goarch: arm
-      # FreeBSD only supports amd64 and 386
       - goos: freebsd
         goarch: arm64
       - goos: freebsd
         goarch: arm
 
-# Archive configuration
 archives:
-  - id: terraform-provider-pocketid
-    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+  - name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
     formats:
       - zip
     files:
@@ -78,15 +47,14 @@ archives:
       - README.md
       - docs/**/*
 
-# Checksum configuration
+# The Terraform Registry expects the checksums, their signature and the manifest under these names
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_SHA256SUMS"
   algorithm: sha256
   extra_files:
-    - glob: "terraform-registry-manifest.json"
+    - glob: terraform-registry-manifest.json
       name_template: "{{ .ProjectName }}_{{ .Version }}_manifest.json"
 
-# Signing configuration for Terraform Registry
 signs:
   - cmd: gpg
     args:
@@ -99,90 +67,21 @@ signs:
       - ${artifact}
     signature: ${artifact}.sig
     artifacts: checksum
-    stdin: "{{ .Env.PASSPHRASE }}"
 
-# Release configuration
+changelog:
+  disable: true
+
+# The release workflow creates the draft with the changelog and publishes it after the build
 release:
   github:
     owner: pocket-id
     name: terraform-provider-pocketid
-
   extra_files:
-    - glob: "terraform-registry-manifest.json"
+    - glob: terraform-registry-manifest.json
       name_template: "{{ .ProjectName }}_{{ .Version }}_manifest.json"
-
-  # Release notes
-  header: |
-    ## Terraform Provider for Pocket-ID v{{ .Version }}
-
-    ### Provider Documentation
-
-    Documentation is available on the [Terraform Registry](https://registry.terraform.io/providers/pocket-id/pocketid/{{ .Version }}/docs).
-
-  footer: |
-    ## What's Next?
-
-    - Read the [documentation](https://registry.terraform.io/providers/pocket-id/pocketid/latest/docs)
-    - Report issues on [GitHub](https://github.com/pocket-id/terraform-provider-pocketid/issues)
-    - Join the discussion on [Pocket-ID](https://github.com/pocket-id/pocket-id)
-
-    **Full Changelog**: https://github.com/pocket-id/terraform-provider-pocketid/compare/{{ .PreviousTag }}...{{ .Tag }}
-
-  # Prerelease configuration
-  prerelease: auto
-
-  # Draft release (set to false for automatic publishing)
-  draft: false
-
-  # Name template for the release
-  name_template: "v{{ .Version }}"
-
-  # Disable the automatic truncation of the release notes
-  disable: false
-
-# Changelog configuration
-changelog:
-  sort: asc
-  use: github
-  filters:
-    exclude:
-      - "^docs:"
-      - "^test:"
-      - "^chore:"
-      - "^build:"
-      - "^ci:"
-      - "typo"
-      - "Merge pull request"
-      - "Merge branch"
-
-  groups:
-    - title: "🚀 Features"
-      regexp: "^.*feat[(\\w)]*:+.*$"
-      order: 100
-    - title: "🐛 Bug Fixes"
-      regexp: "^.*fix[(\\w)]*:+.*$"
-      order: 200
-    - title: "🔨 Enhancements"
-      regexp: "^.*enhance[(\\w)]*:+.*$"
-      order: 300
-    - title: "📚 Documentation"
-      regexp: "^.*docs[(\\w)]*:+.*$"
-      order: 400
-    - title: "🔧 Maintenance"
-      order: 999
-
-# Announce releases
-announce:
-  skip: false
-  discord:
-    enabled: false
-
-  slack:
-    enabled: false
-
-  twitter:
-    enabled: false
-
-# Snapshot configuration (for development builds)
-snapshot:
-  version_template: "{{ incpatch .Version }}-dev-{{ .ShortCommit }}"
+  draft: true
+  use_existing_draft: true
+  replace_existing_draft: false
+  replace_existing_artifacts: true
+  mode: keep-existing
+  name_template: "{{ .Tag }}"

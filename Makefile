@@ -179,20 +179,6 @@ release-dry-run: ## Run goreleaser in dry-run mode
 		echo "  go install github.com/goreleaser/goreleaser@latest"; \
 	fi
 
-.PHONY: release
-release: ## Create a new release (requires GITHUB_TOKEN)
-	@if [ -z "$(GITHUB_TOKEN)" ]; then \
-		echo "$(RED)Error: GITHUB_TOKEN environment variable is not set$(NC)"; \
-		exit 1; \
-	fi
-	@echo "$(GREEN)Creating release...$(NC)"
-	@if command -v goreleaser >/dev/null 2>&1; then \
-		goreleaser release --clean; \
-	else \
-		echo "$(YELLOW)goreleaser not installed. Install it with:$(NC)"; \
-		echo "  go install github.com/goreleaser/goreleaser@latest"; \
-	fi
-
 .PHONY: example-init
 example-init: ## Initialize example configurations
 	@echo "$(GREEN)Initializing examples...$(NC)"

@@ -1,74 +1,205 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump (auto uses conventional commits)
+        type: choice
+        default: auto
+        options:
+          - auto
+          - major
+          - minor
+          - patch
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 permissions:
-  contents: write
-  id-token: write
-  attestations: write
+  contents: read
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
-  goreleaser:
+  prepare:
+    name: Prepare release
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+      commit: ${{ steps.commit.outputs.commit }}
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+      - name: Require the main branch
+        run: |
+          if [[ "$GITHUB_REF" != refs/heads/main ]]; then
+            echo "::error::Releases must be triggered from main."
+            exit 1
+          fi
+
+      - name: Checkout release source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
 
-      - name: Set up Go
-        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v5
+      - name: Setup git-cliff
+        uses: taiki-e/install-action@68a389c788b2cd04016ce8c80ee23b80d2ab3d68 # v2.88.1
         with:
-          go-version-file: "go.mod"
-          cache: true
+          tool: git-cliff@2.14.2
+
+      - name: Calculate next version
+        id: version
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: |
+          version=$(git cliff --bumped-version --unreleased --offline --bump "$BUMP")
+          version=${version#v}
+          if [[ "$version" == "$(cat .version)" ]]; then
+            echo "No commits requiring a version bump; no release created." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+          echo "Preparing release v$version from $(git rev-parse HEAD)." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Update version and changelog
+        if: steps.version.outputs.tag != ''
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          printf '%s\n' "$VERSION" > .version
+          git cliff --prepend CHANGELOG.md --tag "$RELEASE_TAG" --unreleased
+
+      - name: Create bot app token
+        if: steps.version.outputs.tag != ''
+        id: app-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.BOT_APP_CLIENT_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      - name: Commit and tag release
+        if: steps.version.outputs.tag != ''
+        id: commit
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+        run: |
+          # Attribute the release commit to the app and authenticate the push with its installation token
+          bot_name="$APP_SLUG[bot]"
+          bot_id=$(gh api "users/$bot_name" --jq .id)
+          git config user.name "Pocket ID Bot"
+          git config user.email "$bot_id+$bot_name@users.noreply.github.com"
+          gh auth setup-git
+
+          git add .version CHANGELOG.md
+          git commit -m "release: $VERSION"
+          git tag "$RELEASE_TAG"
+
+          # Publish the branch and tag together so a concurrent main update cannot leave an orphaned release tag
+          git push --atomic origin HEAD:refs/heads/main "refs/tags/$RELEASE_TAG"
+          echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build and attest
+    needs: prepare
+    if: needs.prepare.outputs.tag != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    env:
+      VERSION: ${{ needs.prepare.outputs.version }}
+      RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.prepare.outputs.commit }}
+          fetch-depth: 0
+
+      - name: Create bot app token
+        id: app-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.BOT_APP_CLIENT_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          # Reuse the draft when retrying a failed build
+          if is_draft=$(gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft); then
+            if [[ "$is_draft" != true ]]; then
+              echo "::error::Release $RELEASE_TAG is already published."
+              exit 1
+            fi
+          else
+            awk '/^## v[0-9]/ { if (found) exit; found=1; next } found' CHANGELOG.md > "$RUNNER_TEMP/release-notes.md"
+            gh release create "$RELEASE_TAG" --verify-tag --title "$RELEASE_TAG" --notes-file "$RUNNER_TEMP/release-notes.md" --draft
+          fi
+
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
 
       - name: Import GPG key
-        id: import_gpg
+        id: import-gpg
         uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7.0.0
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-
-      - name: Resolve previous stable tag
-        id: previous_tag
-        env:
-          CURRENT_TAG: ${{ github.ref_name }}
-        run: |
-          # The changelog is built with `use: github`, so GoReleaser asks the
-          # GitHub API for the preceding release rather than reading git tags.
-          # That picks up the dev pre-releases, which the cleanup workflow
-          # deletes on this same tag push, and the compare then 404s. The git
-          # level `ignore_tags` setting does not apply to that lookup, so pin
-          # the base to the last stable tag explicitly.
-          previous=$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname \
-            | grep -v -- '-dev' \
-            | grep -vx "$CURRENT_TAG" \
-            | head -n 1)
-          echo "Previous stable tag: ${previous:-<none, first release>}"
-          echo "tag=$previous" >> "$GITHUB_OUTPUT"
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v6
+        uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7.3.0
         with:
-          version: latest
+          version: "~> v2"
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
-          PASSPHRASE: ${{ secrets.PASSPHRASE }}
-          # Pin GoReleaser to the pushed tag so a dev pre-release tag on the
-          # same commit can't win `git describe` and publish the wrong version.
-          GORELEASER_CURRENT_TAG: ${{ github.ref_name }}
-          # Empty when there is no earlier stable tag, which GoReleaser treats
-          # as unset and falls back to its own resolution.
-          GORELEASER_PREVIOUS_TAG: ${{ steps.previous_tag.outputs.tag }}
+          GPG_FINGERPRINT: ${{ steps.import-gpg.outputs.fingerprint }}
 
-      - name: Generate release attestations
-        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+      - name: Binary attestation
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
         with:
-          subject-path: |
-            dist/*.zip
-            dist/*_checksums.txt
+          subject-checksums: ./dist/terraform-provider-pocketid_${{ env.VERSION }}_SHA256SUMS
+
+  publish:
+    name: Publish release
+    needs: [prepare, build]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create bot app token
+        id: app-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.BOT_APP_CLIENT_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      # Publishing the release is what triggers the Terraform Registry to import the version
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
+        run: |
+          gh release edit "$RELEASE_TAG" --draft=false
+          echo "Published [$RELEASE_TAG](https://github.com/$GH_REPO/releases/tag/$RELEASE_TAG)." >> "$GITHUB_STEP_SUMMARY"
