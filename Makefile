@@ -134,14 +134,7 @@ check: fmt-check vet lint test ## Run all checks (format, vet, lint, test)
 
 .PHONY: docs
 docs: ## Generate documentation
-	@echo "$(GREEN)Generating documentation...$(NC)"
-	@if command -v tfplugindocs >/dev/null 2>&1; then \
-		tfplugindocs generate --provider-name=terraform-provider-pocketid; \
-		echo "$(GREEN)Documentation generated!$(NC)"; \
-	else \
-		echo "$(YELLOW)tfplugindocs not installed. Install it with:$(NC)"; \
-		echo "  go install github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@latest"; \
-	fi
+	go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@v0.25.0 generate --provider-name terraform-provider-pocketid
 
 .PHONY: docs-preview
 docs-preview: ## Preview documentation in browser
