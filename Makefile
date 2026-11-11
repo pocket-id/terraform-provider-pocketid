@@ -232,25 +232,18 @@ docker-test: ## Run tests in Docker container
 
 .PHONY: test-env-start
 test-env-start: ## Start Pocket ID test environment
-	@echo "$(GREEN)Starting Pocket ID test environment...$(NC)"
-	@docker compose -f docker-compose.test.yml up -d
-	@echo "$(YELLOW)Waiting for Pocket ID to be ready...$(NC)"
-	@sleep 10
-	@./scripts/prepare-test-db.sh
-	@echo "$(GREEN)Test environment ready!$(NC)"
+	@POCKET_ID_IMAGE=$${POCKET_ID_IMAGE:-ghcr.io/pocket-id/pocket-id:latest} ./scripts/prepare-test-db.sh
 	@echo "  POCKETID_BASE_URL=http://localhost:1411"
 	@echo "  POCKETID_API_TOKEN=test-terraform-provider-token-123456789"
 
 .PHONY: test-env-stop
 test-env-stop: ## Stop Pocket ID test environment
-	@echo "$(GREEN)Stopping Pocket ID test environment...$(NC)"
-	@docker compose -f docker-compose.test.yml down
+	@docker rm -f pocket-id-test >/dev/null 2>&1 || true
 	@rm -rf test-data
-	@echo "$(GREEN)Test environment stopped$(NC)"
 
 .PHONY: test-env-logs
 test-env-logs: ## Show Pocket ID test environment logs
-	@docker compose -f docker-compose.test.yml logs -f
+	@docker logs -f pocket-id-test
 
 .PHONY: test-acc-local
 test-acc-local: test-env-start ## Run acceptance tests with local Pocket ID
