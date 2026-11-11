@@ -338,7 +338,7 @@ func (r *clientResource) Create(ctx context.Context, req resource.CreateRequest,
 
 	// Check version compatibility before making any API calls.
 	if !plan.IsPublic.ValueBool() && !plan.ClientSecret.IsNull() && !plan.ClientSecret.IsUnknown() {
-		if err := r.client.RequireMinVersion("setting a custom client_secret", client.MinVersionCustomClientSecret); err != nil {
+		if err := r.client.RequireMinVersion(ctx, "setting a custom client_secret", client.MinVersionCustomClientSecret); err != nil {
 			resp.Diagnostics.AddAttributeError(
 				path.Root("client_secret"),
 				"Pocket ID version too old",
@@ -375,7 +375,7 @@ func (r *clientResource) Create(ctx context.Context, req resource.CreateRequest,
 		"isPublic": createReq.IsPublic,
 	})
 
-	clientResp, err := r.client.CreateClient(createReq)
+	clientResp, err := r.client.CreateClient(ctx, createReq)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating OIDC client",
@@ -408,10 +408,10 @@ func (r *clientResource) Create(ctx context.Context, req resource.CreateRequest,
 			customSecret = plan.ClientSecret.ValueString()
 		}
 		tflog.Debug(ctx, "Generating client secret for non-public client")
-		secret, err := r.client.GenerateClientSecret(clientResp.ID, customSecret)
+		secret, err := r.client.GenerateClientSecret(ctx, clientResp.ID, customSecret)
 		if err != nil {
 			// Try to clean up the created client
-			_ = r.client.DeleteClient(clientResp.ID)
+			_ = r.client.DeleteClient(ctx, clientResp.ID)
 			resp.Diagnostics.AddError(
 				"Error generating client secret",
 				"Could not generate client secret, the client was deleted. Error: "+err.Error(),
@@ -421,8 +421,8 @@ func (r *clientResource) Create(ctx context.Context, req resource.CreateRequest,
 		// Revoke the secret Pocket-ID created alongside the client, otherwise it
 		// stays valid without Terraform tracking it.
 		if clientResp.CreatedSecret != nil {
-			if err := r.client.DeleteClientSecret(clientResp.ID, clientResp.CreatedSecret.ID); err != nil {
-				_ = r.client.DeleteClient(clientResp.ID)
+			if err := r.client.DeleteClientSecret(ctx, clientResp.ID, clientResp.CreatedSecret.ID); err != nil {
+				_ = r.client.DeleteClient(ctx, clientResp.ID)
 				resp.Diagnostics.AddError(
 					"Error revoking auto-created client secret",
 					"Could not revoke the client secret created by Pocket-ID, the client was deleted. Error: "+err.Error(),
@@ -446,10 +446,10 @@ func (r *clientResource) Create(ctx context.Context, req resource.CreateRequest,
 			tflog.Debug(ctx, "Updating allowed user groups", map[string]any{
 				"groups": groupIDs,
 			})
-			err = r.client.UpdateClientAllowedUserGroups(clientResp.ID, groupIDs)
+			err = r.client.UpdateClientAllowedUserGroups(ctx, clientResp.ID, groupIDs)
 			if err != nil {
 				// Try to clean up the created client
-				_ = r.client.DeleteClient(clientResp.ID)
+				_ = r.client.DeleteClient(ctx, clientResp.ID)
 				resp.Diagnostics.AddError(
 					"Error updating allowed user groups",
 					"Could not update allowed user groups, the client was deleted. Error: "+err.Error(),
@@ -466,9 +466,9 @@ func (r *clientResource) Create(ctx context.Context, req resource.CreateRequest,
 		logoReq := buildCreateRequestFromPlan(ctx, &plan)
 		logoReq.LogoURL = plan.LogoURL.ValueStringPointer()
 		logoReq.DarkLogoURL = plan.DarkLogoURL.ValueStringPointer()
-		if _, err := r.client.UpdateClient(clientResp.ID, logoReq); err != nil {
+		if _, err := r.client.UpdateClient(ctx, clientResp.ID, logoReq); err != nil {
 			// Try to clean up the created client
-			_ = r.client.DeleteClient(clientResp.ID)
+			_ = r.client.DeleteClient(ctx, clientResp.ID)
 			resp.Diagnostics.AddError(
 				"Error setting client logo",
 				"Could not set the client logo, the client was deleted. Error: "+err.Error(),
@@ -500,7 +500,7 @@ func (r *clientResource) Read(ctx context.Context, req resource.ReadRequest, res
 	})
 
 	// Get client from API
-	clientResp, err := r.client.GetClient(state.ID.ValueString())
+	clientResp, err := r.client.GetClient(ctx, state.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error reading OIDC client",
@@ -671,7 +671,7 @@ func (r *clientResource) Update(ctx context.Context, req resource.UpdateRequest,
 	// provider does not expose have to be read back and sent unchanged.
 	// Without this they are reset: a description is cleared, skip_consent
 	// reverts to false and the token durations fall back to their defaults.
-	current, err := r.client.GetClient(plan.ID.ValueString())
+	current, err := r.client.GetClient(ctx, plan.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error reading OIDC client",
@@ -695,7 +695,7 @@ func (r *clientResource) Update(ctx context.Context, req resource.UpdateRequest,
 		"name": updateReq.Name,
 	})
 
-	clientResp, err := r.client.UpdateClient(plan.ID.ValueString(), updateReq)
+	clientResp, err := r.client.UpdateClient(ctx, plan.ID.ValueString(), updateReq)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error updating OIDC client",
@@ -706,13 +706,13 @@ func (r *clientResource) Update(ctx context.Context, req resource.UpdateRequest,
 
 	// Delete logos whose URL was removed from the configuration
 	if plan.LogoURL.IsNull() && !state.LogoURL.IsNull() {
-		if err := r.client.DeleteClientLogo(plan.ID.ValueString(), true); err != nil {
+		if err := r.client.DeleteClientLogo(ctx, plan.ID.ValueString(), true); err != nil {
 			resp.Diagnostics.AddError("Error deleting client logo", "Could not delete the client logo: "+err.Error())
 			return
 		}
 	}
 	if plan.DarkLogoURL.IsNull() && !state.DarkLogoURL.IsNull() {
-		if err := r.client.DeleteClientLogo(plan.ID.ValueString(), false); err != nil {
+		if err := r.client.DeleteClientLogo(ctx, plan.ID.ValueString(), false); err != nil {
 			resp.Diagnostics.AddError("Error deleting client logo", "Could not delete the client dark logo: "+err.Error())
 			return
 		}
@@ -769,7 +769,7 @@ func (r *clientResource) Update(ctx context.Context, req resource.UpdateRequest,
 			tflog.Debug(ctx, "Updating allowed user groups", map[string]any{
 				"groups": plannedGroupIDs,
 			})
-			err = r.client.UpdateClientAllowedUserGroups(plan.ID.ValueString(), plannedGroupIDs)
+			err = r.client.UpdateClientAllowedUserGroups(ctx, plan.ID.ValueString(), plannedGroupIDs)
 			if err != nil {
 				resp.Diagnostics.AddError(
 					"Error updating allowed user groups",
@@ -785,7 +785,7 @@ func (r *clientResource) Update(ctx context.Context, req resource.UpdateRequest,
 	// the secret via the API.
 	if !plan.ClientSecret.IsNull() && !plan.ClientSecret.IsUnknown() &&
 		plan.ClientSecret.ValueString() != state.ClientSecret.ValueString() {
-		if err := r.client.RequireMinVersion("setting a custom client_secret", client.MinVersionCustomClientSecret); err != nil {
+		if err := r.client.RequireMinVersion(ctx, "setting a custom client_secret", client.MinVersionCustomClientSecret); err != nil {
 			resp.Diagnostics.AddAttributeError(
 				path.Root("client_secret"),
 				"Pocket ID version too old",
@@ -796,7 +796,7 @@ func (r *clientResource) Update(ctx context.Context, req resource.UpdateRequest,
 		tflog.Debug(ctx, "Rotating client secret", map[string]any{
 			"id": plan.ID.ValueString(),
 		})
-		secret, err := r.client.GenerateClientSecret(plan.ID.ValueString(), plan.ClientSecret.ValueString())
+		secret, err := r.client.GenerateClientSecret(ctx, plan.ID.ValueString(), plan.ClientSecret.ValueString())
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Error updating client secret",
@@ -813,8 +813,8 @@ func (r *clientResource) Update(ctx context.Context, req resource.UpdateRequest,
 		// itself succeeded, and erroring here would lose the new secret's ID
 		// and make the next rotation unable to clean up either.
 		previousID := state.ClientSecretID
-		if r.client.SupportsClientSecretRevocation() && !previousID.IsNull() && previousID.ValueString() != "" {
-			if err := r.client.DeleteClientSecret(plan.ID.ValueString(), previousID.ValueString()); err != nil {
+		if r.client.SupportsClientSecretRevocation(ctx) && !previousID.IsNull() && previousID.ValueString() != "" {
+			if err := r.client.DeleteClientSecret(ctx, plan.ID.ValueString(), previousID.ValueString()); err != nil {
 				resp.Diagnostics.AddWarning(
 					"Previous client secret was not revoked",
 					fmt.Sprintf(
@@ -850,7 +850,7 @@ func (r *clientResource) Delete(ctx context.Context, req resource.DeleteRequest,
 	})
 
 	// Delete the client
-	err := r.client.DeleteClient(state.ID.ValueString())
+	err := r.client.DeleteClient(ctx, state.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error deleting OIDC client",

@@ -168,7 +168,7 @@ func (d *userDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 		tflog.Debug(ctx, "Reading user data source by ID", map[string]any{
 			"id": config.ID.ValueString(),
 		})
-		userResp, err = d.client.GetUser(config.ID.ValueString())
+		userResp, err = d.client.GetUser(ctx, config.ID.ValueString())
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Error reading user",
@@ -182,7 +182,7 @@ func (d *userDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 			"username": config.Username.ValueString(),
 		})
 
-		usersResp, err := d.client.ListUsers()
+		usersResp, err := d.client.ListUsers(ctx)
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Error listing users",

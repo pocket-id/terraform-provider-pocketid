@@ -33,7 +33,7 @@ func TestClient_CreateClient_UnmarshalError(t *testing.T) {
 		PkceEnabled:  true,
 	}
 
-	result, err := c.CreateClient(createReq)
+	result, err := c.CreateClient(t.Context(), createReq)
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "error unmarshaling response")
@@ -59,7 +59,7 @@ func TestClient_UpdateClient_UnmarshalError(t *testing.T) {
 		PkceEnabled:  true,
 	}
 
-	result, err := c.UpdateClient("test-id", updateReq)
+	result, err := c.UpdateClient(t.Context(), "test-id", updateReq)
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "error unmarshaling response")
@@ -78,7 +78,7 @@ func TestClient_ListClients_UnmarshalError(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.ListClients()
+	result, err := c.ListClients(t.Context())
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "error unmarshaling response")
@@ -97,7 +97,7 @@ func TestClient_GenerateClientSecret_UnmarshalError(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	_, err = c.GenerateClientSecret("test-id", "")
+	_, err = c.GenerateClientSecret(t.Context(), "test-id", "")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "error unmarshaling response")
 }
@@ -120,7 +120,7 @@ func TestClient_CreateUser_UnmarshalError(t *testing.T) {
 		Email:    "test@example.com",
 	}
 
-	result, err := c.CreateUser(createReq)
+	result, err := c.CreateUser(t.Context(), createReq)
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "error unmarshaling response")
@@ -144,7 +144,7 @@ func TestClient_UpdateUser_UnmarshalError(t *testing.T) {
 		Email:    "test@example.com",
 	}
 
-	result, err := c.UpdateUser("test-id", updateReq)
+	result, err := c.UpdateUser(t.Context(), "test-id", updateReq)
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "error unmarshaling response")
@@ -163,7 +163,7 @@ func TestClient_ListUsers_UnmarshalError(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.ListUsers()
+	result, err := c.ListUsers(t.Context())
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "error unmarshaling response")
@@ -187,7 +187,7 @@ func TestClient_CreateUserGroup_UnmarshalError(t *testing.T) {
 		FriendlyName: "Test Group",
 	}
 
-	result, err := c.CreateUserGroup(createReq)
+	result, err := c.CreateUserGroup(t.Context(), createReq)
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "error unmarshaling response")
@@ -211,7 +211,7 @@ func TestClient_UpdateUserGroup_UnmarshalError(t *testing.T) {
 		FriendlyName: "Test Group",
 	}
 
-	result, err := c.UpdateUserGroup("test-id", updateReq)
+	result, err := c.UpdateUserGroup(t.Context(), "test-id", updateReq)
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "error unmarshaling response")
@@ -230,7 +230,7 @@ func TestClient_GetUser_UnmarshalError(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.GetUser("test-id")
+	result, err := c.GetUser(t.Context(), "test-id")
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "error unmarshaling response")
@@ -249,7 +249,7 @@ func TestClient_GetUserGroup_UnmarshalError(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.GetUserGroup("test-id")
+	result, err := c.GetUserGroup(t.Context(), "test-id")
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "error unmarshaling response")
@@ -268,7 +268,7 @@ func TestClient_ListUserGroups_UnmarshalError(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.ListUserGroups()
+	result, err := c.ListUserGroups(t.Context())
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "error unmarshaling response")
@@ -299,7 +299,7 @@ func TestClient_RateLimitWithRetryAfterSeconds(t *testing.T) {
 	require.NoError(t, err)
 
 	start := time.Now()
-	result, err := c.GetClient("test-id")
+	result, err := c.GetClient(t.Context(), "test-id")
 	elapsed := time.Since(start)
 
 	assert.NoError(t, err)
@@ -327,7 +327,7 @@ func TestClient_RequestTimeout(t *testing.T) {
 	require.NoError(t, err)
 
 	start := time.Now()
-	result, err := c.GetClient("test-id")
+	result, err := c.GetClient(t.Context(), "test-id")
 	elapsed := time.Since(start)
 
 	assert.Error(t, err)
@@ -349,7 +349,7 @@ func TestClient_ErrorResponseEmptyBody(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.GetClient("test-id")
+	result, err := c.GetClient(t.Context(), "test-id")
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "HTTP 500")
@@ -404,7 +404,7 @@ func TestClient_NonRetryableErrors(t *testing.T) {
 			c, err := client.NewClient(server.URL, "test-token", false, 30)
 			require.NoError(t, err)
 
-			result, err := c.GetClient("test-id")
+			result, err := c.GetClient(t.Context(), "test-id")
 			assert.Error(t, err)
 			assert.Nil(t, result)
 			assert.Contains(t, err.Error(), fmt.Sprintf("HTTP %d", tc.statusCode))

@@ -394,7 +394,7 @@ func (r *applicationConfigResource) Configure(_ context.Context, req resource.Co
 // applyConfig merges the plan with the current server config, performs the PUT
 // and writes the response back into the plan model.
 func (r *applicationConfigResource) applyConfig(ctx context.Context, plan *applicationConfigModel, diags *diag.Diagnostics) {
-	current, err := r.client.GetApplicationConfig()
+	current, err := r.client.GetApplicationConfig(ctx)
 	if err != nil {
 		diags.AddError(
 			"Error reading application configuration",
@@ -412,7 +412,7 @@ func (r *applicationConfigResource) applyConfig(ctx context.Context, plan *appli
 
 	tflog.Debug(ctx, "Updating application configuration")
 
-	updated, err := r.client.UpdateApplicationConfig(payload)
+	updated, err := r.client.UpdateApplicationConfig(ctx, payload)
 	if err != nil {
 		diags.AddError(
 			"Error updating application configuration",
@@ -459,7 +459,7 @@ func (r *applicationConfigResource) Read(ctx context.Context, req resource.ReadR
 
 	tflog.Debug(ctx, "Reading application configuration")
 
-	cfg, err := r.client.GetApplicationConfig()
+	cfg, err := r.client.GetApplicationConfig(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error reading application configuration",
@@ -470,7 +470,7 @@ func (r *applicationConfigResource) Read(ctx context.Context, req resource.ReadR
 
 	applicationConfigToModel(cfg, &state)
 
-	r.refreshApplicationImages(&state, &resp.Diagnostics)
+	r.refreshApplicationImages(ctx, &state, &resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -526,22 +526,22 @@ func (r *applicationConfigResource) applyApplicationImages(ctx context.Context, 
 
 // refreshApplicationImages drops managed images that are gone from the server
 // (deleted in the UI) from state, so the next plan uploads them again.
-func (r *applicationConfigResource) refreshApplicationImages(state *applicationConfigModel, diags *diag.Diagnostics) {
-	state.Logo = r.refreshApplicationImage(client.ApplicationImageLogo, state.Logo, diags)
-	state.DarkLogo = r.refreshApplicationImage(client.ApplicationImageDarkLogo, state.DarkLogo, diags)
-	state.EmailLogo = r.refreshApplicationImage(client.ApplicationImageEmailLogo, state.EmailLogo, diags)
-	state.BackgroundImage = r.refreshApplicationImage(client.ApplicationImageBackground, state.BackgroundImage, diags)
-	state.Favicon = r.refreshApplicationImage(client.ApplicationImageFavicon, state.Favicon, diags)
-	state.DefaultProfilePicture = r.refreshApplicationImage(client.ApplicationImageDefaultProfilePicture, state.DefaultProfilePicture, diags)
+func (r *applicationConfigResource) refreshApplicationImages(ctx context.Context, state *applicationConfigModel, diags *diag.Diagnostics) {
+	state.Logo = r.refreshApplicationImage(ctx, client.ApplicationImageLogo, state.Logo, diags)
+	state.DarkLogo = r.refreshApplicationImage(ctx, client.ApplicationImageDarkLogo, state.DarkLogo, diags)
+	state.EmailLogo = r.refreshApplicationImage(ctx, client.ApplicationImageEmailLogo, state.EmailLogo, diags)
+	state.BackgroundImage = r.refreshApplicationImage(ctx, client.ApplicationImageBackground, state.BackgroundImage, diags)
+	state.Favicon = r.refreshApplicationImage(ctx, client.ApplicationImageFavicon, state.Favicon, diags)
+	state.DefaultProfilePicture = r.refreshApplicationImage(ctx, client.ApplicationImageDefaultProfilePicture, state.DefaultProfilePicture, diags)
 }
 
 // refreshApplicationImage returns the managed image value to keep in state:
 // null when Pocket ID no longer has a custom version of it.
-func (r *applicationConfigResource) refreshApplicationImage(image client.ApplicationImage, managed types.Object, diags *diag.Diagnostics) types.Object {
+func (r *applicationConfigResource) refreshApplicationImage(ctx context.Context, image client.ApplicationImage, managed types.Object, diags *diag.Diagnostics) types.Object {
 	if managed.IsNull() {
 		return managed
 	}
-	set, err := r.client.ApplicationImageSet(image)
+	set, err := r.client.ApplicationImageSet(ctx, image)
 	if err != nil {
 		diags.AddError("Error reading application image", "Could not read application image: "+err.Error())
 		return managed
@@ -568,7 +568,7 @@ func (r *applicationConfigResource) applyApplicationImage(ctx context.Context, i
 				fmt.Sprintf("Pocket ID cannot remove the %s. It is no longer managed by Terraform and stays until replaced.", attribute))
 			return planned, diags
 		}
-		if err := r.client.DeleteApplicationImage(image); err != nil {
+		if err := r.client.DeleteApplicationImage(ctx, image); err != nil {
 			diags.AddAttributeError(path.Root(attribute), "Error resetting application image", err.Error())
 		}
 		return planned, diags
@@ -588,7 +588,7 @@ func (r *applicationConfigResource) applyApplicationImage(ctx context.Context, i
 	}
 
 	filename := filepath.Base(file.Source.ValueString())
-	if err := r.client.UpdateApplicationImage(image, filename, data); err != nil {
+	if err := r.client.UpdateApplicationImage(ctx, image, filename, data); err != nil {
 		diags.AddAttributeError(sourcePath, "Error setting application image",
 			fmt.Sprintf("Pocket ID rejected %q: %s", filename, err))
 		return planned, diags

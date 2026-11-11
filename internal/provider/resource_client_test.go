@@ -5,6 +5,7 @@ package provider_test
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"regexp"
 	"strings"
@@ -946,7 +947,7 @@ func TestAccResourceClient_logoDeletedOutOfBand(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					if err := c.DeleteClientLogo(clientID, true); err != nil {
+					if err := c.DeleteClientLogo(context.Background(), clientID, true); err != nil {
 						t.Fatalf("deleting logo: %v", err)
 					}
 				},

@@ -225,7 +225,7 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 
 	// Handle custom ID if provided
 	if !plan.ID.IsNull() && !plan.ID.IsUnknown() {
-		if err := r.client.RequireMinVersion("setting a custom user id", client.MinVersionCustomUserID); err != nil {
+		if err := r.client.RequireMinVersion(ctx, "setting a custom user id", client.MinVersionCustomUserID); err != nil {
 			resp.Diagnostics.AddAttributeError(
 				path.Root("id"),
 				"Pocket ID version too old",
@@ -242,7 +242,7 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 		"isAdmin":  createReq.IsAdmin,
 	})
 
-	userResp, err := r.client.CreateUser(createReq)
+	userResp, err := r.client.CreateUser(ctx, createReq)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating user",
@@ -286,10 +286,10 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 			tflog.Debug(ctx, "Updating user groups", map[string]any{
 				"groups": groupIDs,
 			})
-			err = r.client.UpdateUserGroups(userResp.ID, groupIDs)
+			err = r.client.UpdateUserGroups(ctx, userResp.ID, groupIDs)
 			if err != nil {
 				// Try to clean up the created user
-				_ = r.client.DeleteUser(userResp.ID)
+				_ = r.client.DeleteUser(ctx, userResp.ID)
 				resp.Diagnostics.AddError(
 					"Error updating user groups",
 					"Could not update user groups, the user was deleted. Error: "+err.Error(),
@@ -310,10 +310,10 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 			tflog.Debug(ctx, "Updating user custom claims", map[string]any{
 				"id": userResp.ID,
 			})
-			updatedClaims, err := r.client.UpdateUserCustomClaims(userResp.ID, claims)
+			updatedClaims, err := r.client.UpdateUserCustomClaims(ctx, userResp.ID, claims)
 			if err != nil {
 				// Try to clean up the created user
-				_ = r.client.DeleteUser(userResp.ID)
+				_ = r.client.DeleteUser(ctx, userResp.ID)
 				resp.Diagnostics.AddError(
 					"Error updating user custom claims",
 					"Could not update user custom claims, the user was deleted. Error: "+err.Error(),
@@ -335,7 +335,7 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 		resp.Diagnostics.Append(diags...)
 		if resp.Diagnostics.HasError() {
 			// Try to clean up the created user
-			_ = r.client.DeleteUser(userResp.ID)
+			_ = r.client.DeleteUser(ctx, userResp.ID)
 			resp.Diagnostics.AddError(
 				"Error creating user",
 				"The user was deleted because its profile picture could not be set.",
@@ -364,7 +364,7 @@ func (r *userResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 	})
 
 	// Get user from API
-	userResp, err := r.client.GetUser(state.ID.ValueString())
+	userResp, err := r.client.GetUser(ctx, state.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error reading user",
@@ -470,7 +470,7 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 		"email":    updateReq.Email,
 	})
 
-	userResp, err := r.client.UpdateUser(plan.ID.ValueString(), updateReq)
+	userResp, err := r.client.UpdateUser(ctx, plan.ID.ValueString(), updateReq)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error updating user",
@@ -532,7 +532,7 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 			tflog.Debug(ctx, "Updating user groups", map[string]any{
 				"groups": plannedGroupIDs,
 			})
-			err = r.client.UpdateUserGroups(plan.ID.ValueString(), plannedGroupIDs)
+			err = r.client.UpdateUserGroups(ctx, plan.ID.ValueString(), plannedGroupIDs)
 			if err != nil {
 				resp.Diagnostics.AddError(
 					"Error updating user groups",
@@ -555,7 +555,7 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 		tflog.Debug(ctx, "Updating user custom claims", map[string]any{
 			"id": plan.ID.ValueString(),
 		})
-		updatedClaims, err := r.client.UpdateUserCustomClaims(plan.ID.ValueString(), claims)
+		updatedClaims, err := r.client.UpdateUserCustomClaims(ctx, plan.ID.ValueString(), claims)
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Error updating user custom claims",
@@ -576,7 +576,7 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 	// does, so an edited file is a difference here too.
 	if !plan.ProfilePicture.Equal(state.ProfilePicture) {
 		if plan.ProfilePicture.IsNull() {
-			if err := r.client.DeleteUserProfilePicture(plan.ID.ValueString()); err != nil {
+			if err := r.client.DeleteUserProfilePicture(ctx, plan.ID.ValueString()); err != nil {
 				resp.Diagnostics.AddError(
 					"Error resetting user profile picture",
 					"Could not reset the user profile picture: "+err.Error(),
@@ -616,7 +616,7 @@ func (r *userResource) uploadProfilePicture(ctx context.Context, userID string, 
 	}
 
 	filename := filepath.Base(picture.Source.ValueString())
-	if err := r.client.UpdateUserProfilePicture(userID, filename, data); err != nil {
+	if err := r.client.UpdateUserProfilePicture(ctx, userID, filename, data); err != nil {
 		diags.AddAttributeError(sourcePath, "Error setting user profile picture",
 			fmt.Sprintf("Pocket ID rejected %q: %s", filename, err))
 		return planned, diags
@@ -643,7 +643,7 @@ func (r *userResource) Delete(ctx context.Context, req resource.DeleteRequest, r
 	})
 
 	// Delete the user
-	err := r.client.DeleteUser(state.ID.ValueString())
+	err := r.client.DeleteUser(ctx, state.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error deleting user",

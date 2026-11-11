@@ -144,7 +144,7 @@ func (d *usersDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 	tflog.Debug(ctx, "Reading users data source")
 
 	// Get users from API
-	usersResp, err := d.client.ListUsers()
+	usersResp, err := d.client.ListUsers(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error reading users",

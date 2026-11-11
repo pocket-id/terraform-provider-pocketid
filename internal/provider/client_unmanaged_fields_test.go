@@ -4,6 +4,7 @@
 package provider_test
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -35,7 +36,7 @@ func setUnmanagedClientFields(id string) error {
 		return err
 	}
 
-	current, err := c.GetClient(id)
+	current, err := c.GetClient(context.Background(), id)
 	if err != nil {
 		return err
 	}
@@ -54,7 +55,7 @@ func setUnmanagedClientFields(id string) error {
 		RefreshTokenDurationMinutes: canaryRefreshTokenMins,
 	}
 
-	_, err = c.UpdateClient(id, req)
+	_, err = c.UpdateClient(context.Background(), id, req)
 	return err
 }
 
@@ -66,7 +67,7 @@ func checkUnmanagedClientFieldsPreserved(id string) error {
 		return err
 	}
 
-	got, err := c.GetClient(id)
+	got, err := c.GetClient(context.Background(), id)
 	if err != nil {
 		return err
 	}
@@ -95,7 +96,7 @@ func checkClientSecretCount(clientID string, want int) error {
 		return err
 	}
 
-	secrets, err := c.ListClientSecrets(clientID)
+	secrets, err := c.ListClientSecrets(context.Background(), clientID)
 	if err != nil {
 		return err
 	}
@@ -117,7 +118,7 @@ func checkClientSecretAbsent(clientID, secretID string) error {
 		return err
 	}
 
-	secrets, err := c.ListClientSecrets(clientID)
+	secrets, err := c.ListClientSecrets(context.Background(), clientID)
 	if err != nil {
 		return err
 	}
@@ -145,7 +146,7 @@ func setClientLogoURL(id, logoURL string) error {
 		return err
 	}
 
-	current, err := c.GetClient(id)
+	current, err := c.GetClient(context.Background(), id)
 	if err != nil {
 		return err
 	}
@@ -161,7 +162,7 @@ func setClientLogoURL(id, logoURL string) error {
 		LogoURL:            &logoURL,
 	}
 
-	_, err = c.UpdateClient(id, req)
+	_, err = c.UpdateClient(context.Background(), id, req)
 	return err
 }
 
@@ -172,7 +173,7 @@ func checkClientLogoFlags(id string, wantLogo, wantDarkLogo bool) error {
 		return err
 	}
 
-	got, err := c.GetClient(id)
+	got, err := c.GetClient(context.Background(), id)
 	if err != nil {
 		return err
 	}
@@ -193,7 +194,7 @@ func checkNoClientNamed(name string) error {
 		return err
 	}
 
-	clients, err := c.ListClients()
+	clients, err := c.ListClients(context.Background())
 	if err != nil {
 		return err
 	}

@@ -118,7 +118,7 @@ func TestClient_CreateClient(t *testing.T) {
 		LaunchURL:                &launchUrl,
 	}
 
-	result, err := c.CreateClient(createReq)
+	result, err := c.CreateClient(t.Context(), createReq)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedClient, result)
 }
@@ -133,7 +133,7 @@ func TestClient_CreateClient_CreatedSecret(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.CreateClient(&client.OIDCClientCreateRequest{Name: "Test Client"})
+	result, err := c.CreateClient(t.Context(), &client.OIDCClientCreateRequest{Name: "Test Client"})
 	require.NoError(t, err)
 	require.NotNil(t, result.CreatedSecret)
 	assert.Equal(t, "secret-id", result.CreatedSecret.ID)
@@ -167,7 +167,7 @@ func TestClient_GetClient(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.GetClient("test-client-id")
+	result, err := c.GetClient(t.Context(), "test-client-id")
 	assert.NoError(t, err)
 	assert.Equal(t, expectedClient, result)
 }
@@ -214,7 +214,7 @@ func TestClient_UpdateClient(t *testing.T) {
 		LaunchURL:                &launchUrl,
 	}
 
-	result, err := c.UpdateClient("test-client-id", updateReq)
+	result, err := c.UpdateClient(t.Context(), "test-client-id", updateReq)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedClient, result)
 }
@@ -232,7 +232,7 @@ func TestClient_DeleteClient(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	err = c.DeleteClient("test-client-id")
+	err = c.DeleteClient(t.Context(), "test-client-id")
 	assert.NoError(t, err)
 }
 
@@ -270,7 +270,7 @@ func TestClient_ListClients(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.ListClients()
+	result, err := c.ListClients(t.Context())
 	assert.NoError(t, err)
 	assert.Equal(t, expectedResponse, result)
 }
@@ -324,7 +324,7 @@ func TestClient_ListUserGroups_FetchesAllPages(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.ListUserGroups()
+	result, err := c.ListUserGroups(t.Context())
 	require.NoError(t, err)
 
 	var ids []string
@@ -366,7 +366,7 @@ func TestClient_ListUsers_StopsWhenPaginationIsIgnored(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.ListUsers()
+	result, err := c.ListUsers(t.Context())
 	require.NoError(t, err)
 
 	assert.Len(t, result.Data, 2)
@@ -438,7 +438,7 @@ func TestClient_GenerateClientSecret(t *testing.T) {
 			c, err := client.NewClient(server.URL, "test-token", false, 30)
 			require.NoError(t, err)
 
-			secret, err := c.GenerateClientSecret("test-client-id", tt.customSecret)
+			secret, err := c.GenerateClientSecret(t.Context(), "test-client-id", tt.customSecret)
 			assert.NoError(t, err)
 			assert.Equal(t, expectedSecret, secret.Secret)
 		})
@@ -498,7 +498,7 @@ func TestClient_ErrorHandling(t *testing.T) {
 			c, err := client.NewClient(server.URL, "test-token", false, 30)
 			require.NoError(t, err)
 
-			_, err = c.GetClient("test-client-id")
+			_, err = c.GetClient(t.Context(), "test-client-id")
 			assert.Error(t, err)
 			assert.Contains(t, err.Error(), tt.expectedErrMsg)
 		})
@@ -531,7 +531,7 @@ func TestClient_RetryLogic(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.GetClient("test-client-id")
+	result, err := c.GetClient(t.Context(), "test-client-id")
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
 	assert.Equal(t, "test-client-id", result.ID)
@@ -553,7 +553,7 @@ func TestClient_RetryExhaustion(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	_, err = c.GetClient("test-client-id")
+	_, err = c.GetClient(t.Context(), "test-client-id")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "request failed after 4 attempts")
 	assert.Equal(t, 4, attempts, "Should have made 4 attempts (initial + 3 retries)")
@@ -574,7 +574,7 @@ func TestClient_NonRetryableError(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	_, err = c.GetClient("test-client-id")
+	_, err = c.GetClient(t.Context(), "test-client-id")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "HTTP 404: Not found")
 	assert.Equal(t, 1, attempts, "Should have made only 1 attempt (no retries for 404)")
@@ -593,7 +593,7 @@ func TestClient_ContextCancellation(t *testing.T) {
 
 	// Note: The current client doesn't expose context-aware methods,
 	// but this test is prepared for when they are added
-	_, err = c.GetClient("test-client-id")
+	_, err = c.GetClient(t.Context(), "test-client-id")
 	// The error might be a timeout or context cancellation depending on timing
 	assert.Error(t, err)
 }
@@ -637,7 +637,7 @@ func TestClient_CreateUser(t *testing.T) {
 		LastName:  "User",
 	}
 
-	result, err := c.CreateUser(createReq)
+	result, err := c.CreateUser(t.Context(), createReq)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedUser, result)
 }
@@ -675,7 +675,7 @@ func TestClient_CreateUserGroup(t *testing.T) {
 		FriendlyName: "Test Group",
 	}
 
-	result, err := c.CreateUserGroup(createReq)
+	result, err := c.CreateUserGroup(t.Context(), createReq)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedGroup, result)
 }
@@ -697,7 +697,7 @@ func TestClient_UpdateUserGroups(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	err = c.UpdateUserGroups("test-user-id", []string{"group1", "group2"})
+	err = c.UpdateUserGroups(t.Context(), "test-user-id", []string{"group1", "group2"})
 	assert.NoError(t, err)
 }
 
@@ -722,7 +722,7 @@ func TestClient_UpdateUserCustomClaims(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	claims, err := c.UpdateUserCustomClaims("test-user-id", []client.CustomClaim{
+	claims, err := c.UpdateUserCustomClaims(t.Context(), "test-user-id", []client.CustomClaim{
 		{Key: "department", Value: "engineering"},
 		{Key: "level", Value: "senior"},
 	})
@@ -766,7 +766,7 @@ func TestClient_UpdateUserProfilePicture(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	require.NoError(t, c.UpdateUserProfilePicture("u1", "avatar.png", image))
+	require.NoError(t, c.UpdateUserProfilePicture(t.Context(), "u1", "avatar.png", image))
 	assert.True(t, called)
 }
 
@@ -788,7 +788,7 @@ func TestClient_UpdateUserProfilePicture_RetryResendsBody(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	require.NoError(t, c.UpdateUserProfilePicture("u1", "avatar.png", image))
+	require.NoError(t, c.UpdateUserProfilePicture(t.Context(), "u1", "avatar.png", image))
 	assert.Equal(t, 2, attempts)
 }
 
@@ -814,7 +814,7 @@ func TestClient_DeleteUserProfilePicture(t *testing.T) {
 			c, err := client.NewClient(server.URL, "test-token", false, 30)
 			require.NoError(t, err)
 
-			err = c.DeleteUserProfilePicture("u1")
+			err = c.DeleteUserProfilePicture(t.Context(), "u1")
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
@@ -842,7 +842,7 @@ func TestClient_UpdateUserCustomClaims_Clear(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	claims, err := c.UpdateUserCustomClaims("test-user-id", nil)
+	claims, err := c.UpdateUserCustomClaims(t.Context(), "test-user-id", nil)
 	require.NoError(t, err)
 	assert.Empty(t, claims)
 }
@@ -865,7 +865,7 @@ func TestClient_UpdateGroupCustomClaims(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	claims, err := c.UpdateGroupCustomClaims("test-group-id", []client.CustomClaim{
+	claims, err := c.UpdateGroupCustomClaims(t.Context(), "test-group-id", []client.CustomClaim{
 		{Key: "role", Value: "admin"},
 	})
 	require.NoError(t, err)
@@ -889,7 +889,7 @@ func TestClient_UpdateClientAllowedUserGroups(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	err = c.UpdateClientAllowedUserGroups("test-client-id", []string{"group1", "group2"})
+	err = c.UpdateClientAllowedUserGroups(t.Context(), "test-client-id", []string{"group1", "group2"})
 	assert.NoError(t, err)
 }
 
@@ -922,7 +922,7 @@ func TestClient_RateLimitHandling(t *testing.T) {
 	require.NoError(t, err)
 
 	start := time.Now()
-	result, err := c.GetClient("test-client-id")
+	result, err := c.GetClient(t.Context(), "test-client-id")
 	elapsed := time.Since(start)
 
 	assert.NoError(t, err)
@@ -961,7 +961,7 @@ func TestClient_RateLimitWithoutRetryAfter(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.GetClient("test-client-id")
+	result, err := c.GetClient(t.Context(), "test-client-id")
 
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
@@ -992,7 +992,7 @@ func TestClient_CreateOneTimeAccessToken(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	token, err := c.CreateOneTimeAccessToken("test-user-id", &client.OneTimeAccessTokenRequest{TTL: "15m"})
+	token, err := c.CreateOneTimeAccessToken(t.Context(), "test-user-id", &client.OneTimeAccessTokenRequest{TTL: "15m"})
 	assert.NoError(t, err)
 	assert.Equal(t, "test-token-123456", token.Token)
 }
@@ -1016,7 +1016,7 @@ func TestClient_CreateOneTimeAccessToken_SendsTTL(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	token, err := c.CreateOneTimeAccessToken("test-user-id", &client.OneTimeAccessTokenRequest{TTL: "1h"})
+	token, err := c.CreateOneTimeAccessToken(t.Context(), "test-user-id", &client.OneTimeAccessTokenRequest{TTL: "1h"})
 	assert.NoError(t, err)
 	assert.Equal(t, "tok", token.Token)
 }
@@ -1036,7 +1036,7 @@ func TestClient_CreateOneTimeAccessToken_Error(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	_, err = c.CreateOneTimeAccessToken("test-user-id", &client.OneTimeAccessTokenRequest{TTL: "1s"})
+	_, err = c.CreateOneTimeAccessToken(t.Context(), "test-user-id", &client.OneTimeAccessTokenRequest{TTL: "1s"})
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "invalid ttl")
 }
@@ -1071,7 +1071,7 @@ func TestClient_CreateScimServiceProvider(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.CreateScimServiceProvider(&client.ScimServiceProviderCreateRequest{
+	result, err := c.CreateScimServiceProvider(t.Context(), &client.ScimServiceProviderCreateRequest{
 		Endpoint:     "https://scim.example.com/v2",
 		Token:        "secret-token",
 		OidcClientID: "client-123",
@@ -1106,7 +1106,7 @@ func TestClient_GetClientScimServiceProvider(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.GetClientScimServiceProvider("client-123")
+	result, err := c.GetClientScimServiceProvider(t.Context(), "client-123")
 	assert.NoError(t, err)
 	assert.Equal(t, "scim-1", result.ID)
 	assert.Equal(t, "decrypted-token", result.Token)
@@ -1136,7 +1136,7 @@ func TestClient_UpdateScimServiceProvider(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.UpdateScimServiceProvider("scim-1", &client.ScimServiceProviderCreateRequest{
+	result, err := c.UpdateScimServiceProvider(t.Context(), "scim-1", &client.ScimServiceProviderCreateRequest{
 		Endpoint:     "https://scim.example.com/v2/updated",
 		Token:        "new-token",
 		OidcClientID: "client-123",
@@ -1156,7 +1156,7 @@ func TestClient_DeleteScimServiceProvider(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	err = c.DeleteScimServiceProvider("scim-1")
+	err = c.DeleteScimServiceProvider(t.Context(), "scim-1")
 	assert.NoError(t, err)
 }
 
@@ -1204,7 +1204,7 @@ func TestClient_RequireMinVersion(t *testing.T) {
 			c, err := client.NewClient(server.URL, "test-token", false, 30)
 			require.NoError(t, err)
 
-			err = c.RequireMinVersion("test feature", tt.minVersion)
+			err = c.RequireMinVersion(t.Context(), "test feature", tt.minVersion)
 			if tt.wantErr {
 				assert.Error(t, err)
 				if tt.errContains != "" {
@@ -1231,8 +1231,8 @@ func TestClient_RequireMinVersion_CachesResult(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	require.NoError(t, c.RequireMinVersion("feature A", "2.12.0"))
-	require.NoError(t, c.RequireMinVersion("feature B", "2.10.0"))
+	require.NoError(t, c.RequireMinVersion(t.Context(), "feature A", "2.12.0"))
+	require.NoError(t, c.RequireMinVersion(t.Context(), "feature B", "2.10.0"))
 
 	assert.Equal(t, 1, requestCount, "the version endpoint should only be queried once and then cached")
 }
@@ -1249,7 +1249,7 @@ func TestClient_RequireMinVersion_VersionEndpointError(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	err = c.RequireMinVersion("test feature", "2.12.0")
+	err = c.RequireMinVersion(t.Context(), "test feature", "2.12.0")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "could not determine")
 }
@@ -1281,7 +1281,7 @@ func TestClient_GenerateClientSecret_ReturnsID(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	got, err := c.GenerateClientSecret("test-client-id", "")
+	got, err := c.GenerateClientSecret(t.Context(), "test-client-id", "")
 	require.NoError(t, err)
 	assert.Equal(t, "secret-abc", got.ID)
 	assert.Equal(t, "value-123", got.Secret)
@@ -1312,7 +1312,7 @@ func TestClient_DeleteClientSecret(t *testing.T) {
 			c, err := client.NewClient(server.URL, "test-token", false, 30)
 			require.NoError(t, err)
 
-			err = c.DeleteClientSecret("c1", "s1")
+			err = c.DeleteClientSecret(t.Context(), "c1", "s1")
 			if tt.wantErr {
 				require.Error(t, err)
 				assert.Contains(t, err.Error(), tt.errContains)
@@ -1351,7 +1351,7 @@ func TestClient_DeleteClientLogo(t *testing.T) {
 			c, err := client.NewClient(server.URL, "test-token", false, 30)
 			require.NoError(t, err)
 
-			err = c.DeleteClientLogo("c1", tt.light)
+			err = c.DeleteClientLogo(t.Context(), "c1", tt.light)
 			if tt.wantErr {
 				require.Error(t, err)
 				assert.Contains(t, err.Error(), tt.errContains)
@@ -1379,7 +1379,7 @@ func TestClient_ListClientSecrets(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	secrets, err := c.ListClientSecrets("c1")
+	secrets, err := c.ListClientSecrets(t.Context(), "c1")
 	require.NoError(t, err)
 	require.Len(t, secrets, 2)
 	assert.Equal(t, "s1", secrets[0].ID)

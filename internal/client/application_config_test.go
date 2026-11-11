@@ -39,7 +39,7 @@ func TestGetApplicationConfig(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	cfg, err := c.GetApplicationConfig()
+	cfg, err := c.GetApplicationConfig(t.Context())
 	require.NoError(t, err)
 
 	assert.Equal(t, "My App", cfg.AppName)
@@ -75,7 +75,7 @@ func TestUpdateApplicationConfig(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	updated, err := c.UpdateApplicationConfig(&client.ApplicationConfig{
+	updated, err := c.UpdateApplicationConfig(t.Context(), &client.ApplicationConfig{
 		AppName:  "Updated App",
 		SmtpHost: "smtp.example.com",
 	})
@@ -111,12 +111,12 @@ func TestApplicationConfig_EmailSettingModesRoundTrip(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	cfg, err := c.GetApplicationConfig()
+	cfg, err := c.GetApplicationConfig(t.Context())
 	require.NoError(t, err)
 	assert.Equal(t, "browserRecognition", cfg.EmailLoginNotificationMode)
 	assert.Equal(t, "optional", cfg.EmailVerification)
 
-	_, err = c.UpdateApplicationConfig(cfg)
+	_, err = c.UpdateApplicationConfig(t.Context(), cfg)
 	require.NoError(t, err)
 	assert.Equal(t, "browserRecognition", receivedBody["emailLoginNotificationMode"])
 	assert.Equal(t, "optional", receivedBody["emailVerification"])
@@ -158,7 +158,7 @@ func TestClient_UpdateApplicationImage(t *testing.T) {
 			c, err := client.NewClient(server.URL, "test-token", false, 30)
 			require.NoError(t, err)
 
-			require.NoError(t, c.UpdateApplicationImage(tt.image, "image.png", image))
+			require.NoError(t, c.UpdateApplicationImage(t.Context(), tt.image, "image.png", image))
 			assert.True(t, called)
 		})
 	}
@@ -190,7 +190,7 @@ func TestClient_DeleteApplicationImage(t *testing.T) {
 			c, err := client.NewClient(server.URL, "test-token", false, 30)
 			require.NoError(t, err)
 
-			err = c.DeleteApplicationImage(client.ApplicationImageDarkLogo)
+			err = c.DeleteApplicationImage(t.Context(), client.ApplicationImageDarkLogo)
 			if tt.wantErr {
 				require.Error(t, err)
 				assert.Contains(t, err.Error(), tt.errContains)
@@ -228,7 +228,7 @@ func TestClient_ApplicationImageSet(t *testing.T) {
 			c, err := client.NewClient(server.URL, "test-token", false, 30)
 			require.NoError(t, err)
 
-			got, err := c.ApplicationImageSet(client.ApplicationImageDarkLogo)
+			got, err := c.ApplicationImageSet(t.Context(), client.ApplicationImageDarkLogo)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return

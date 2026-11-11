@@ -5,6 +5,7 @@ package provider_test
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"image/color"
 	"io"
@@ -348,7 +349,7 @@ func TestAccResourceApplicationConfig_imageDeletedOutOfBand(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					if err := c.DeleteApplicationImage(client.ApplicationImageLogo); err != nil {
+					if err := c.DeleteApplicationImage(context.Background(), client.ApplicationImageLogo); err != nil {
 						t.Fatalf("deleting logo: %v", err)
 					}
 				},

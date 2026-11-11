@@ -43,7 +43,7 @@ func TestClient_GetUser(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.GetUser("test-user-id")
+	result, err := c.GetUser(t.Context(), "test-user-id")
 	assert.NoError(t, err)
 	assert.Equal(t, expectedUser, result)
 }
@@ -60,7 +60,7 @@ func TestClient_GetUser_Error(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.GetUser("nonexistent-id")
+	result, err := c.GetUser(t.Context(), "nonexistent-id")
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "HTTP 404")
@@ -107,7 +107,7 @@ func TestClient_UpdateUser(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.UpdateUser("test-user-id", updateReq)
+	result, err := c.UpdateUser(t.Context(), "test-user-id", updateReq)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedUser, result)
 }
@@ -124,7 +124,7 @@ func TestClient_DeleteUser(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	err = c.DeleteUser("test-user-id")
+	err = c.DeleteUser(t.Context(), "test-user-id")
 	assert.NoError(t, err)
 }
 
@@ -140,7 +140,7 @@ func TestClient_DeleteUser_Error(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	err = c.DeleteUser("test-user-id")
+	err = c.DeleteUser(t.Context(), "test-user-id")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "HTTP 403")
 }
@@ -192,7 +192,7 @@ func TestClient_ListUsers(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.ListUsers()
+	result, err := c.ListUsers(t.Context())
 	assert.NoError(t, err)
 	assert.Equal(t, expectedResponse, result)
 	assert.Equal(t, expectedUsers, result.Data)
@@ -223,7 +223,7 @@ func TestClient_ListUsers_Empty(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.ListUsers()
+	result, err := c.ListUsers(t.Context())
 	assert.NoError(t, err)
 	assert.Equal(t, expectedResponse, result)
 	assert.Empty(t, result.Data)
@@ -250,7 +250,7 @@ func TestClient_GetUserGroup(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.GetUserGroup("test-group-id")
+	result, err := c.GetUserGroup(t.Context(), "test-group-id")
 	assert.NoError(t, err)
 	assert.Equal(t, expectedGroup, result)
 }
@@ -267,7 +267,7 @@ func TestClient_GetUserGroup_NotFound(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.GetUserGroup("nonexistent-id")
+	result, err := c.GetUserGroup(t.Context(), "nonexistent-id")
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "HTTP 404")
@@ -304,7 +304,7 @@ func TestClient_UpdateUserGroup(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.UpdateUserGroup("test-group-id", updateReq)
+	result, err := c.UpdateUserGroup(t.Context(), "test-group-id", updateReq)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedGroup, result)
 }
@@ -321,7 +321,7 @@ func TestClient_DeleteUserGroup(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	err = c.DeleteUserGroup("test-group-id")
+	err = c.DeleteUserGroup(t.Context(), "test-group-id")
 	assert.NoError(t, err)
 }
 
@@ -337,7 +337,7 @@ func TestClient_DeleteUserGroup_InUse(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	err = c.DeleteUserGroup("test-group-id")
+	err = c.DeleteUserGroup(t.Context(), "test-group-id")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "HTTP 409")
 }
@@ -385,7 +385,7 @@ func TestClient_ListUserGroups(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.ListUserGroups()
+	result, err := c.ListUserGroups(t.Context())
 	assert.NoError(t, err)
 	assert.Equal(t, expectedResponse, result)
 	assert.Equal(t, expectedGroups, result.Data)
@@ -403,7 +403,7 @@ func TestClient_ListUserGroups_Error(t *testing.T) {
 	c, err := client.NewClient(server.URL, "test-token", false, 30)
 	require.NoError(t, err)
 
-	result, err := c.ListUserGroups()
+	result, err := c.ListUserGroups(t.Context())
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "HTTP 500")

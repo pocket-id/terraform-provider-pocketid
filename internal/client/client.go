@@ -84,7 +84,7 @@ func NewClient(baseURL, apiToken string, skipTLSVerify bool, timeout int64) (*Cl
 	}, nil
 }
 
-func (c *Client) currentVersion() (*goversion.Version, error) {
+func (c *Client) currentVersion(ctx context.Context) (*goversion.Version, error) {
 	c.versionMu.Lock()
 	defer c.versionMu.Unlock()
 
@@ -92,7 +92,7 @@ func (c *Client) currentVersion() (*goversion.Version, error) {
 		return c.cachedVersion, nil
 	}
 
-	body, err := c.doRequest("GET", "/api/version/current", nil)
+	body, err := c.doRequest(ctx, "GET", "/api/version/current", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -111,8 +111,8 @@ func (c *Client) currentVersion() (*goversion.Version, error) {
 	return v, nil
 }
 
-func (c *Client) RequireMinVersion(feature, minVersion string) error {
-	current, err := c.currentVersion()
+func (c *Client) RequireMinVersion(ctx context.Context, feature, minVersion string) error {
+	current, err := c.currentVersion(ctx)
 	if err != nil {
 		return fmt.Errorf(
 			"could not determine the connected Pocket ID version to verify compatibility with %s (requires Pocket ID >= %s): %w",
@@ -140,8 +140,8 @@ func (c *Client) RequireMinVersion(feature, minVersion string) error {
 // cannot be determined, because /api/version/current only exists since 2.3.0 or
 // because the instance reports a non-semver version, fall back to the legacy
 // endpoint.
-func (c *Client) usesClientSecretsEndpoint() bool {
-	current, err := c.currentVersion()
+func (c *Client) usesClientSecretsEndpoint(ctx context.Context) bool {
+	current, err := c.currentVersion(ctx)
 	if err != nil {
 		return false
 	}
@@ -150,12 +150,7 @@ func (c *Client) usesClientSecretsEndpoint() bool {
 }
 
 // doRequest performs an HTTP request to the Pocket-ID API
-func (c *Client) doRequest(method, endpoint string, body interface{}) ([]byte, error) {
-	return c.doRequestWithContext(context.Background(), method, endpoint, body)
-}
-
-// doRequestWithContext performs an HTTP request to the Pocket-ID API with context support
-func (c *Client) doRequestWithContext(ctx context.Context, method, endpoint string, body interface{}) ([]byte, error) {
+func (c *Client) doRequest(ctx context.Context, method, endpoint string, body interface{}) ([]byte, error) {
 	var jsonBody []byte
 	if body != nil {
 		var err error
@@ -417,8 +412,8 @@ func parseRetryAfter(retryAfter string) int {
 // OIDC Client methods
 
 // CreateClient creates a new OIDC client
-func (c *Client) CreateClient(createReq *OIDCClientCreateRequest) (*OIDCClient, error) {
-	body, err := c.doRequest("POST", "/api/oidc/clients", createReq)
+func (c *Client) CreateClient(ctx context.Context, createReq *OIDCClientCreateRequest) (*OIDCClient, error) {
+	body, err := c.doRequest(ctx, "POST", "/api/oidc/clients", createReq)
 	if err != nil {
 		return nil, err
 	}
@@ -432,8 +427,8 @@ func (c *Client) CreateClient(createReq *OIDCClientCreateRequest) (*OIDCClient, 
 }
 
 // GetClient retrieves an OIDC client by ID
-func (c *Client) GetClient(clientID string) (*OIDCClient, error) {
-	body, err := c.doRequest("GET", fmt.Sprintf("/api/oidc/clients/%s", clientID), nil)
+func (c *Client) GetClient(ctx context.Context, clientID string) (*OIDCClient, error) {
+	body, err := c.doRequest(ctx, "GET", fmt.Sprintf("/api/oidc/clients/%s", clientID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -447,8 +442,8 @@ func (c *Client) GetClient(clientID string) (*OIDCClient, error) {
 }
 
 // UpdateClient updates an existing OIDC client
-func (c *Client) UpdateClient(clientID string, updateReq *OIDCClientCreateRequest) (*OIDCClient, error) {
-	body, err := c.doRequest("PUT", fmt.Sprintf("/api/oidc/clients/%s", clientID), updateReq)
+func (c *Client) UpdateClient(ctx context.Context, clientID string, updateReq *OIDCClientCreateRequest) (*OIDCClient, error) {
+	body, err := c.doRequest(ctx, "PUT", fmt.Sprintf("/api/oidc/clients/%s", clientID), updateReq)
 	if err != nil {
 		return nil, err
 	}
@@ -462,16 +457,16 @@ func (c *Client) UpdateClient(clientID string, updateReq *OIDCClientCreateReques
 }
 
 // DeleteClient deletes an OIDC client
-func (c *Client) DeleteClient(clientID string) error {
-	_, err := c.doRequest("DELETE", fmt.Sprintf("/api/oidc/clients/%s", clientID), nil)
+func (c *Client) DeleteClient(ctx context.Context, clientID string) error {
+	_, err := c.doRequest(ctx, "DELETE", fmt.Sprintf("/api/oidc/clients/%s", clientID), nil)
 	return err
 }
 
 // listAllPages retrieves every page of a paginated list endpoint. The first
 // request is sent without parameters, so servers that do not paginate the
 // endpoint keep answering exactly as before.
-func listAllPages[T any](c *Client, endpoint string) (*PaginatedResponse[T], error) {
-	body, err := c.doRequest("GET", endpoint, nil)
+func listAllPages[T any](ctx context.Context, c *Client, endpoint string) (*PaginatedResponse[T], error) {
+	body, err := c.doRequest(ctx, "GET", endpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -493,7 +488,7 @@ func listAllPages[T any](c *Client, endpoint string) (*PaginatedResponse[T], err
 			query.Set("pagination[limit]", strconv.Itoa(first.Pagination.ItemsPerPage))
 		}
 
-		body, err := c.doRequest("GET", endpoint+"?"+query.Encode(), nil)
+		body, err := c.doRequest(ctx, "GET", endpoint+"?"+query.Encode(), nil)
 		if err != nil {
 			return nil, err
 		}
@@ -517,14 +512,14 @@ func listAllPages[T any](c *Client, endpoint string) (*PaginatedResponse[T], err
 }
 
 // ListClients retrieves all OIDC clients
-func (c *Client) ListClients() (*PaginatedResponse[OIDCClient], error) {
-	return listAllPages[OIDCClient](c, "/api/oidc/clients")
+func (c *Client) ListClients(ctx context.Context) (*PaginatedResponse[OIDCClient], error) {
+	return listAllPages[OIDCClient](ctx, c, "/api/oidc/clients")
 }
 
 // UpdateClientAllowedUserGroups updates the allowed user groups for an OIDC client
-func (c *Client) UpdateClientAllowedUserGroups(clientID string, groupIDs []string) error {
+func (c *Client) UpdateClientAllowedUserGroups(ctx context.Context, clientID string, groupIDs []string) error {
 	req := UpdateAllowedUserGroupsRequest{UserGroupIDs: groupIDs}
-	_, err := c.doRequest("PUT", fmt.Sprintf("/api/oidc/clients/%s/allowed-user-groups", clientID), req)
+	_, err := c.doRequest(ctx, "PUT", fmt.Sprintf("/api/oidc/clients/%s/allowed-user-groups", clientID), req)
 	return err
 }
 
@@ -534,14 +529,14 @@ func (c *Client) UpdateClientAllowedUserGroups(clientID string, groupIDs []strin
 // The returned ID identifies the created secret so it can be revoked later. It
 // is empty on Pocket ID before 2.14.0, where the singular endpoint replaced the
 // client's only secret and there is nothing to revoke.
-func (c *Client) GenerateClientSecret(clientID string, secret string) (ClientSecretResponse, error) {
+func (c *Client) GenerateClientSecret(ctx context.Context, clientID string, secret string) (ClientSecretResponse, error) {
 	endpoint := fmt.Sprintf("/api/oidc/clients/%s/secret", clientID)
-	if c.usesClientSecretsEndpoint() {
+	if c.usesClientSecretsEndpoint(ctx) {
 		endpoint += "s"
 	}
 
 	req := ClientSecretRequest{Secret: secret}
-	body, err := c.doRequest("POST", endpoint, req)
+	body, err := c.doRequest(ctx, "POST", endpoint, req)
 	if err != nil {
 		return ClientSecretResponse{}, err
 	}
@@ -557,8 +552,8 @@ func (c *Client) GenerateClientSecret(clientID string, secret string) (ClientSec
 // DeleteClientSecret revokes a single secret of an OIDC client. A secret that
 // is already gone is not an error: it may have been revoked in the Pocket ID
 // UI. Only available from Pocket ID 2.14.0.
-func (c *Client) DeleteClientSecret(clientID, secretID string) error {
-	_, err := c.doRequest("DELETE", fmt.Sprintf("/api/oidc/clients/%s/secrets/%s", clientID, secretID), nil)
+func (c *Client) DeleteClientSecret(ctx context.Context, clientID, secretID string) error {
+	_, err := c.doRequest(ctx, "DELETE", fmt.Sprintf("/api/oidc/clients/%s/secrets/%s", clientID, secretID), nil)
 	if err != nil && strings.Contains(err.Error(), "HTTP 404") {
 		return nil
 	}
@@ -567,8 +562,8 @@ func (c *Client) DeleteClientSecret(clientID, secretID string) error {
 
 // DeleteClientLogo removes the light (or, with light false, the dark) logo of
 // an OIDC client. A logo that is already gone is not an error.
-func (c *Client) DeleteClientLogo(clientID string, light bool) error {
-	_, err := c.doRequest(http.MethodDelete, fmt.Sprintf("/api/oidc/clients/%s/logo?light=%t", clientID, light), nil)
+func (c *Client) DeleteClientLogo(ctx context.Context, clientID string, light bool) error {
+	_, err := c.doRequest(ctx, http.MethodDelete, fmt.Sprintf("/api/oidc/clients/%s/logo?light=%t", clientID, light), nil)
 	if err != nil && strings.Contains(err.Error(), "HTTP 404") {
 		return nil
 	}
@@ -577,8 +572,8 @@ func (c *Client) DeleteClientLogo(clientID string, light bool) error {
 
 // ListClientSecrets returns the secrets of an OIDC client without their values.
 // Only available from Pocket ID 2.14.0.
-func (c *Client) ListClientSecrets(clientID string) ([]ClientSecret, error) {
-	body, err := c.doRequest("GET", fmt.Sprintf("/api/oidc/clients/%s/secrets", clientID), nil)
+func (c *Client) ListClientSecrets(ctx context.Context, clientID string) ([]ClientSecret, error) {
+	body, err := c.doRequest(ctx, "GET", fmt.Sprintf("/api/oidc/clients/%s/secrets", clientID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -593,15 +588,15 @@ func (c *Client) ListClientSecrets(clientID string) ([]ClientSecret, error) {
 
 // SupportsClientSecretRevocation reports whether the connected instance exposes
 // the per-secret endpoints needed to revoke a superseded secret.
-func (c *Client) SupportsClientSecretRevocation() bool {
-	return c.usesClientSecretsEndpoint()
+func (c *Client) SupportsClientSecretRevocation(ctx context.Context) bool {
+	return c.usesClientSecretsEndpoint(ctx)
 }
 
 // User methods
 
 // CreateUser creates a new user
-func (c *Client) CreateUser(user *UserCreateRequest) (*User, error) {
-	body, err := c.doRequest("POST", "/api/users", user)
+func (c *Client) CreateUser(ctx context.Context, user *UserCreateRequest) (*User, error) {
+	body, err := c.doRequest(ctx, "POST", "/api/users", user)
 	if err != nil {
 		return nil, err
 	}
@@ -615,8 +610,8 @@ func (c *Client) CreateUser(user *UserCreateRequest) (*User, error) {
 }
 
 // GetUser retrieves a user by ID
-func (c *Client) GetUser(userID string) (*User, error) {
-	body, err := c.doRequest("GET", fmt.Sprintf("/api/users/%s", userID), nil)
+func (c *Client) GetUser(ctx context.Context, userID string) (*User, error) {
+	body, err := c.doRequest(ctx, "GET", fmt.Sprintf("/api/users/%s", userID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -630,8 +625,8 @@ func (c *Client) GetUser(userID string) (*User, error) {
 }
 
 // UpdateUser updates an existing user
-func (c *Client) UpdateUser(userID string, user *UserCreateRequest) (*User, error) {
-	body, err := c.doRequest("PUT", fmt.Sprintf("/api/users/%s", userID), user)
+func (c *Client) UpdateUser(ctx context.Context, userID string, user *UserCreateRequest) (*User, error) {
+	body, err := c.doRequest(ctx, "PUT", fmt.Sprintf("/api/users/%s", userID), user)
 	if err != nil {
 		return nil, err
 	}
@@ -645,50 +640,50 @@ func (c *Client) UpdateUser(userID string, user *UserCreateRequest) (*User, erro
 }
 
 // DeleteUser deletes a user
-func (c *Client) DeleteUser(userID string) error {
-	_, err := c.doRequest("DELETE", fmt.Sprintf("/api/users/%s", userID), nil)
+func (c *Client) DeleteUser(ctx context.Context, userID string) error {
+	_, err := c.doRequest(ctx, "DELETE", fmt.Sprintf("/api/users/%s", userID), nil)
 	return err
 }
 
 // UpdateUserProfilePicture uploads a user's profile picture
-func (c *Client) UpdateUserProfilePicture(userID, filename string, data []byte) error {
+func (c *Client) UpdateUserProfilePicture(ctx context.Context, userID, filename string, data []byte) error {
 	contentType, body, err := multipartFile("file", filename, data)
 	if err != nil {
 		return err
 	}
-	_, err = c.doRawRequest(context.Background(), http.MethodPut, fmt.Sprintf("/api/users/%s/profile-picture", userID), contentType, body)
+	_, err = c.doRawRequest(ctx, http.MethodPut, fmt.Sprintf("/api/users/%s/profile-picture", userID), contentType, body)
 	return err
 }
 
 // DeleteUserProfilePicture restores a user's default profile picture
-func (c *Client) DeleteUserProfilePicture(userID string) error {
-	_, err := c.doRequest("DELETE", fmt.Sprintf("/api/users/%s/profile-picture", userID), nil)
+func (c *Client) DeleteUserProfilePicture(ctx context.Context, userID string) error {
+	_, err := c.doRequest(ctx, "DELETE", fmt.Sprintf("/api/users/%s/profile-picture", userID), nil)
 	return err
 }
 
 // ListUsers retrieves all users
-func (c *Client) ListUsers() (*PaginatedResponse[User], error) {
-	return listAllPages[User](c, "/api/users")
+func (c *Client) ListUsers(ctx context.Context) (*PaginatedResponse[User], error) {
+	return listAllPages[User](ctx, c, "/api/users")
 }
 
 // UpdateUserGroups updates the groups a user belongs to
-func (c *Client) UpdateUserGroups(userID string, groupIDs []string) error {
+func (c *Client) UpdateUserGroups(ctx context.Context, userID string, groupIDs []string) error {
 	// Ensure groupIDs is never nil to serialize as empty array instead of null
 	if groupIDs == nil {
 		groupIDs = []string{}
 	}
 	req := UpdateUserGroupsRequest{UserGroupIDs: groupIDs}
-	_, err := c.doRequest("PUT", fmt.Sprintf("/api/users/%s/user-groups", userID), req)
+	_, err := c.doRequest(ctx, "PUT", fmt.Sprintf("/api/users/%s/user-groups", userID), req)
 	return err
 }
 
 // UpdateUserCustomClaims replaces all custom claims for a user. The API
 // performs a full replace: claims not present in the list are removed.
-func (c *Client) UpdateUserCustomClaims(userID string, claims []CustomClaim) ([]CustomClaim, error) {
+func (c *Client) UpdateUserCustomClaims(ctx context.Context, userID string, claims []CustomClaim) ([]CustomClaim, error) {
 	if claims == nil {
 		claims = []CustomClaim{}
 	}
-	body, err := c.doRequest("PUT", fmt.Sprintf("/api/custom-claims/user/%s", userID), claims)
+	body, err := c.doRequest(ctx, "PUT", fmt.Sprintf("/api/custom-claims/user/%s", userID), claims)
 	if err != nil {
 		return nil, err
 	}
@@ -704,8 +699,8 @@ func (c *Client) UpdateUserCustomClaims(userID string, claims []CustomClaim) ([]
 // User Group methods
 
 // CreateUserGroup creates a new user group
-func (c *Client) CreateUserGroup(group *UserGroupCreateRequest) (*UserGroup, error) {
-	body, err := c.doRequest("POST", "/api/user-groups", group)
+func (c *Client) CreateUserGroup(ctx context.Context, group *UserGroupCreateRequest) (*UserGroup, error) {
+	body, err := c.doRequest(ctx, "POST", "/api/user-groups", group)
 	if err != nil {
 		return nil, err
 	}
@@ -719,8 +714,8 @@ func (c *Client) CreateUserGroup(group *UserGroupCreateRequest) (*UserGroup, err
 }
 
 // GetUserGroup retrieves a user group by ID
-func (c *Client) GetUserGroup(groupID string) (*UserGroup, error) {
-	body, err := c.doRequest("GET", fmt.Sprintf("/api/user-groups/%s", groupID), nil)
+func (c *Client) GetUserGroup(ctx context.Context, groupID string) (*UserGroup, error) {
+	body, err := c.doRequest(ctx, "GET", fmt.Sprintf("/api/user-groups/%s", groupID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -734,8 +729,8 @@ func (c *Client) GetUserGroup(groupID string) (*UserGroup, error) {
 }
 
 // UpdateUserGroup updates an existing user group
-func (c *Client) UpdateUserGroup(groupID string, group *UserGroupCreateRequest) (*UserGroup, error) {
-	body, err := c.doRequest("PUT", fmt.Sprintf("/api/user-groups/%s", groupID), group)
+func (c *Client) UpdateUserGroup(ctx context.Context, groupID string, group *UserGroupCreateRequest) (*UserGroup, error) {
+	body, err := c.doRequest(ctx, "PUT", fmt.Sprintf("/api/user-groups/%s", groupID), group)
 	if err != nil {
 		return nil, err
 	}
@@ -749,23 +744,23 @@ func (c *Client) UpdateUserGroup(groupID string, group *UserGroupCreateRequest) 
 }
 
 // DeleteUserGroup deletes a user group
-func (c *Client) DeleteUserGroup(groupID string) error {
-	_, err := c.doRequest("DELETE", fmt.Sprintf("/api/user-groups/%s", groupID), nil)
+func (c *Client) DeleteUserGroup(ctx context.Context, groupID string) error {
+	_, err := c.doRequest(ctx, "DELETE", fmt.Sprintf("/api/user-groups/%s", groupID), nil)
 	return err
 }
 
 // ListUserGroups retrieves all user groups
-func (c *Client) ListUserGroups() (*PaginatedResponse[UserGroup], error) {
-	return listAllPages[UserGroup](c, "/api/user-groups")
+func (c *Client) ListUserGroups(ctx context.Context) (*PaginatedResponse[UserGroup], error) {
+	return listAllPages[UserGroup](ctx, c, "/api/user-groups")
 }
 
 // UpdateGroupCustomClaims replaces all custom claims for a user group. The API
 // performs a full replace: claims not present in the list are removed.
-func (c *Client) UpdateGroupCustomClaims(groupID string, claims []CustomClaim) ([]CustomClaim, error) {
+func (c *Client) UpdateGroupCustomClaims(ctx context.Context, groupID string, claims []CustomClaim) ([]CustomClaim, error) {
 	if claims == nil {
 		claims = []CustomClaim{}
 	}
-	body, err := c.doRequest("PUT", fmt.Sprintf("/api/custom-claims/user-group/%s", groupID), claims)
+	body, err := c.doRequest(ctx, "PUT", fmt.Sprintf("/api/custom-claims/user-group/%s", groupID), claims)
 	if err != nil {
 		return nil, err
 	}
@@ -818,8 +813,8 @@ func appConfigVariablesToConfig(vars []AppConfigVariable) *ApplicationConfig {
 
 // GetApplicationConfig retrieves the full application configuration, including
 // private values, from GET /api/application-configuration/all.
-func (c *Client) GetApplicationConfig() (*ApplicationConfig, error) {
-	body, err := c.doRequest("GET", "/api/application-configuration/all", nil)
+func (c *Client) GetApplicationConfig(ctx context.Context) (*ApplicationConfig, error) {
+	body, err := c.doRequest(ctx, "GET", "/api/application-configuration/all", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -835,8 +830,8 @@ func (c *Client) GetApplicationConfig() (*ApplicationConfig, error) {
 // UpdateApplicationConfig updates the application configuration via
 // PUT /api/application-configuration. The provided config is sent in full; any
 // empty string field is reset to its server-side default by Pocket-ID.
-func (c *Client) UpdateApplicationConfig(cfg *ApplicationConfig) (*ApplicationConfig, error) {
-	body, err := c.doRequest("PUT", "/api/application-configuration", cfg)
+func (c *Client) UpdateApplicationConfig(ctx context.Context, cfg *ApplicationConfig) (*ApplicationConfig, error) {
+	body, err := c.doRequest(ctx, "PUT", "/api/application-configuration", cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -863,19 +858,19 @@ const (
 )
 
 // UpdateApplicationImage uploads an application image
-func (c *Client) UpdateApplicationImage(image ApplicationImage, filename string, data []byte) error {
+func (c *Client) UpdateApplicationImage(ctx context.Context, image ApplicationImage, filename string, data []byte) error {
 	contentType, body, err := multipartFile("file", filename, data)
 	if err != nil {
 		return err
 	}
-	_, err = c.doRawRequest(context.Background(), http.MethodPut, "/api/application-images/"+string(image), contentType, body)
+	_, err = c.doRawRequest(ctx, http.MethodPut, "/api/application-images/"+string(image), contentType, body)
 	return err
 }
 
 // ApplicationImageSet reports whether a custom version of an application image
 // is set. The skipCache value is unique, so no cache in front of Pocket ID can
 // answer for it.
-func (c *Client) ApplicationImageSet(image ApplicationImage) (bool, error) {
+func (c *Client) ApplicationImageSet(ctx context.Context, image ApplicationImage) (bool, error) {
 	endpoint, err := url.Parse("/api/application-images/" + string(image))
 	if err != nil {
 		return false, err
@@ -885,7 +880,7 @@ func (c *Client) ApplicationImageSet(image ApplicationImage) (bool, error) {
 	query.Set("skipCache", strconv.FormatInt(time.Now().UnixNano(), 10))
 	endpoint.RawQuery = query.Encode()
 
-	_, err = c.doRequest(http.MethodGet, endpoint.String(), nil)
+	_, err = c.doRequest(ctx, http.MethodGet, endpoint.String(), nil)
 	if err != nil && strings.Contains(err.Error(), "HTTP 404") {
 		return false, nil
 	}
@@ -894,8 +889,8 @@ func (c *Client) ApplicationImageSet(image ApplicationImage) (bool, error) {
 
 // DeleteApplicationImage restores the default of an application image. An
 // image that has no custom version is not an error.
-func (c *Client) DeleteApplicationImage(image ApplicationImage) error {
-	_, err := c.doRequest(http.MethodDelete, "/api/application-images/"+string(image), nil)
+func (c *Client) DeleteApplicationImage(ctx context.Context, image ApplicationImage) error {
+	_, err := c.doRequest(ctx, http.MethodDelete, "/api/application-images/"+string(image), nil)
 	if err != nil && strings.Contains(err.Error(), "HTTP 404") {
 		return nil
 	}
@@ -903,14 +898,13 @@ func (c *Client) DeleteApplicationImage(image ApplicationImage) error {
 }
 
 // CreateOneTimeAccessToken creates a new one-time access token for a user
-func (c *Client) CreateOneTimeAccessToken(userID string, req *OneTimeAccessTokenRequest) (*OneTimeAccessToken, error) {
-	ctx := context.Background()
+func (c *Client) CreateOneTimeAccessToken(ctx context.Context, userID string, req *OneTimeAccessTokenRequest) (*OneTimeAccessToken, error) {
 	tflog.Debug(ctx, "CreateOneTimeAccessToken request", map[string]interface{}{
 		"user_id": userID,
 		"ttl":     req.TTL,
 	})
 
-	body, err := c.doRequestWithContext(ctx, "POST", fmt.Sprintf("/api/users/%s/one-time-access-token", userID), req)
+	body, err := c.doRequest(ctx, "POST", fmt.Sprintf("/api/users/%s/one-time-access-token", userID), req)
 	if err != nil {
 		return nil, err
 	}
@@ -926,8 +920,8 @@ func (c *Client) CreateOneTimeAccessToken(userID string, req *OneTimeAccessToken
 // SCIM service provider methods
 
 // CreateScimServiceProvider creates a new SCIM service provider configuration.
-func (c *Client) CreateScimServiceProvider(req *ScimServiceProviderCreateRequest) (*ScimServiceProvider, error) {
-	body, err := c.doRequest("POST", "/api/scim/service-provider", req)
+func (c *Client) CreateScimServiceProvider(ctx context.Context, req *ScimServiceProviderCreateRequest) (*ScimServiceProvider, error) {
+	body, err := c.doRequest(ctx, "POST", "/api/scim/service-provider", req)
 	if err != nil {
 		return nil, err
 	}
@@ -942,8 +936,8 @@ func (c *Client) CreateScimServiceProvider(req *ScimServiceProviderCreateRequest
 
 // GetClientScimServiceProvider retrieves the SCIM service provider configuration
 // for an OIDC client. The token is returned decrypted.
-func (c *Client) GetClientScimServiceProvider(clientID string) (*ScimServiceProvider, error) {
-	body, err := c.doRequest("GET", fmt.Sprintf("/api/oidc/clients/%s/scim-service-provider", clientID), nil)
+func (c *Client) GetClientScimServiceProvider(ctx context.Context, clientID string) (*ScimServiceProvider, error) {
+	body, err := c.doRequest(ctx, "GET", fmt.Sprintf("/api/oidc/clients/%s/scim-service-provider", clientID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -957,8 +951,8 @@ func (c *Client) GetClientScimServiceProvider(clientID string) (*ScimServiceProv
 }
 
 // UpdateScimServiceProvider updates an existing SCIM service provider configuration.
-func (c *Client) UpdateScimServiceProvider(id string, req *ScimServiceProviderCreateRequest) (*ScimServiceProvider, error) {
-	body, err := c.doRequest("PUT", fmt.Sprintf("/api/scim/service-provider/%s", id), req)
+func (c *Client) UpdateScimServiceProvider(ctx context.Context, id string, req *ScimServiceProviderCreateRequest) (*ScimServiceProvider, error) {
+	body, err := c.doRequest(ctx, "PUT", fmt.Sprintf("/api/scim/service-provider/%s", id), req)
 	if err != nil {
 		return nil, err
 	}
@@ -972,14 +966,14 @@ func (c *Client) UpdateScimServiceProvider(id string, req *ScimServiceProviderCr
 }
 
 // DeleteScimServiceProvider deletes a SCIM service provider configuration by ID.
-func (c *Client) DeleteScimServiceProvider(id string) error {
-	_, err := c.doRequest("DELETE", fmt.Sprintf("/api/scim/service-provider/%s", id), nil)
+func (c *Client) DeleteScimServiceProvider(ctx context.Context, id string) error {
+	_, err := c.doRequest(ctx, "DELETE", fmt.Sprintf("/api/scim/service-provider/%s", id), nil)
 	return err
 }
 
 // SyncLdap triggers an LDAP synchronization. It returns an error if LDAP is not
 // enabled or the sync fails.
-func (c *Client) SyncLdap() error {
-	_, err := c.doRequest("POST", "/api/application-configuration/sync-ldap", nil)
+func (c *Client) SyncLdap(ctx context.Context) error {
+	_, err := c.doRequest(ctx, "POST", "/api/application-configuration/sync-ldap", nil)
 	return err
 }

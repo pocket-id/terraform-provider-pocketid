@@ -5,6 +5,7 @@ package provider_test
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"image"
 	"image/color"
@@ -62,7 +63,7 @@ func uploadUserProfilePicture(id, p string) error {
 	if err != nil {
 		return err
 	}
-	return c.UpdateUserProfilePicture(id, filepath.Base(p), data)
+	return c.UpdateUserProfilePicture(context.Background(), id, filepath.Base(p), data)
 }
 
 // checkNoUserNamed asserts no user with the given username exists.
@@ -72,7 +73,7 @@ func checkNoUserNamed(username string) error {
 		return err
 	}
 
-	users, err := c.ListUsers()
+	users, err := c.ListUsers(context.Background())
 	if err != nil {
 		return err
 	}
