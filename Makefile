@@ -134,7 +134,7 @@ check: fmt-check vet lint test ## Run all checks (format, vet, lint, test)
 
 .PHONY: docs
 docs: ## Generate documentation
-	go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@v0.25.0 generate --provider-name terraform-provider-pocketid
+	go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@v0.25.0 generate --provider-name terraform-provider-pocketid --rendered-provider-name "Pocket ID"
 
 .PHONY: docs-preview
 docs-preview: ## Preview documentation in browser

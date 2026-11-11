@@ -1,5 +1,5 @@
 ---
-page_title: "pocketid_groups Data Source - terraform-provider-pocketid"
+page_title: "pocketid_groups Data Source - Pocket ID"
 subcategory: ""
 description: |-
   Retrieves information about all Pocket ID groups.
